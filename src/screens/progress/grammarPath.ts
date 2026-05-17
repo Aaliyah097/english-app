@@ -22,35 +22,37 @@ export type GrammarTopic = (typeof GRAMMAR_PATH)[number];
 
 // Short fallback rule for each canonical topic. Used when the checkpoint's
 // currentLearningFocus.rule is empty — either an old stored checkpoint or a
-// turn where the AI didn't include the rule field. Keep these terse; the AI
-// is allowed to override with something more tailored.
+// turn where the AI didn't include the rule field. Examples are intentionally
+// everyday-life scenes so the rule reads naturally regardless of the user's
+// declared interests; the AI is encouraged to override with something more
+// tailored on the next turn.
 const DEFAULT_RULES: Record<string, string> = {
   'Present Simple':
-    'Use Present Simple for facts, habits, and how things normally work — e.g. "The service reads messages from Kafka."',
+    'Use Present Simple for facts, habits, and routines — e.g. "She drinks coffee every morning."',
   'Present Continuous':
-    'Use Present Continuous for actions happening now or around now — e.g. "I\'m debugging the consumer."',
+    'Use Present Continuous for actions happening right now or around now — e.g. "I\'m reading a book."',
   'Past Simple':
-    'Use Past Simple for finished actions at a specific past time — e.g. "We deployed the fix yesterday."',
+    'Use Past Simple for finished actions at a specific past time — e.g. "We visited Paris last summer."',
   'Future Simple':
-    "Use `will` for spontaneous decisions and predictions, `be going to` for plans — e.g. \"I'll handle it.\" / \"We're going to scale up.\"",
+    "Use `will` for spontaneous decisions and predictions, `be going to` for plans — e.g. \"I'll call you later.\" / \"We're going to move next year.\"",
   'Present Perfect':
-    'Use Present Perfect for past actions still connected to now — e.g. "We\'ve already shipped that."',
+    'Use Present Perfect for past actions still connected to now — e.g. "I\'ve already eaten."',
   'Present Perfect vs Past Simple':
-    'Past Simple for a finished moment ("we shipped Tuesday"); Present Perfect for an unfinished time or recent relevance ("we\'ve shipped it").',
+    'Past Simple for a finished moment ("I saw her yesterday"); Present Perfect for unfinished time or recent relevance ("I\'ve seen that film").',
   'Past Continuous':
-    'Use Past Continuous for an action in progress in the past, often interrupted — e.g. "I was reviewing the PR when it failed."',
+    'Use Past Continuous for an action in progress in the past, often interrupted — e.g. "I was cooking when the phone rang."',
   'Compound sentences':
-    'Join two independent clauses with `and`, `but`, `or`, or `so` — e.g. "It compiled, but the test failed."',
+    'Join two independent clauses with `and`, `but`, `or`, or `so` — e.g. "It was raining, but we went for a walk anyway."',
   'Complex sentences':
-    'Attach a subordinate clause with `because`, `since`, `although`, `while`, `if`… — e.g. "We rolled back because metrics tanked."',
+    'Attach a subordinate clause with `because`, `since`, `although`, `while`, `if`… — e.g. "I stayed home because I was tired."',
   Conditionals:
-    'Zero conditional for general truths ("If you push to main, CI runs"); first for likely futures ("If it fails, we\'ll retry").',
+    'Zero conditional for general truths ("If you heat water, it boils"); first for likely futures ("If it rains, we\'ll stay in").',
   'Passive voice':
-    'In passive voice the subject receives the action — e.g. "The deploy was approved by ops."',
+    'In passive voice the subject receives the action — e.g. "The cake was eaten by the kids."',
   'Relative clauses':
-    'Use `who/which/that` to add information about a noun — e.g. "The service that handles auth is down."',
+    'Use `who/which/that` to add information about a noun — e.g. "The book that I\'m reading is great."',
   'Advanced explanations and trade-offs':
-    'Explain decisions clearly: state the choice, the trade-off, and the reason — e.g. "We chose Kafka over RabbitMQ because we needed durable log replay."',
+    'Explain decisions clearly: state the choice, the trade-off, and the reason — e.g. "I prefer trains over flying because they\'re more comfortable, even if slower."',
 };
 
 /** Returns a short default rule for the given topic, or '' if none is known. */

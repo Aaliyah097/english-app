@@ -58,7 +58,7 @@ export function OnboardingScreen({ onComplete }: Props) {
       currentLearningFocus: {
         grammarTopic: 'Present Simple',
         difficulty: 2,
-        rule: 'Use Present Simple for facts, habits, and how things normally work — e.g. "The service reads messages from Kafka."',
+        rule: 'Use Present Simple for facts, habits, and routines — e.g. "She drinks coffee every morning."',
       },
       recentMistakes: [],
       completedTopics: [],
