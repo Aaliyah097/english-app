@@ -14,6 +14,6 @@ function makePlaceholder(name: string) {
 }
 
 export { OnboardingScreen } from './onboarding/OnboardingScreen';
-export const PracticeScreen = makePlaceholder('Practice');
+export { PracticeScreen } from './practice/PracticeScreen';
 export const ProgressScreen = makePlaceholder('Progress');
 export const SettingsScreen = makePlaceholder('Settings');

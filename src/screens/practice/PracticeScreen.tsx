@@ -1,0 +1,344 @@
+import { useEffect, useMemo, useState } from 'react';
+import { theme as T } from '../../theme';
+import { Btn, Bubble, Chip, Icon, InputDock, TypingDot } from '../../ui';
+import {
+  getCheckpoint,
+  getUserProfile,
+  mergeCheckpoint,
+  subscribe,
+} from '../../storage';
+import type { Exercise, LearningCheckpoint, TutorResponse, UserProfile } from '../../types';
+import { ExerciseProgress } from './ExerciseProgress';
+import { InlineDiff } from './InlineDiff';
+import { TopicBar } from './TopicBar';
+import { diffWords } from './diff';
+import { useTutorTurn } from './useTutorTurn';
+
+type Props = {
+  onMenu?: (() => void) | undefined;
+};
+
+type Phase = 'input' | 'awaiting' | 'review' | 'error';
+
+function seedExerciseFromCheckpoint(
+  profile: UserProfile,
+  checkpoint: LearningCheckpoint,
+): Exercise {
+  return {
+    sourceLanguage: profile.nativeLanguage,
+    targetLanguage: profile.targetLanguage,
+    sentence: '',
+    grammarTopic: checkpoint.currentLearningFocus.grammarTopic,
+    difficulty: checkpoint.currentLearningFocus.difficulty,
+  };
+}
+
+export function PracticeScreen({ onMenu }: Props) {
+  // Read profile + checkpoint directly and re-read on every storage write.
+  // We don't use useStorageSnapshot here because that requires a referentially
+  // stable selector return; we want the full live objects, which deserialise
+  // fresh on each call.
+  const [tick, setTick] = useState(0);
+  useEffect(() => subscribe(() => setTick((n) => n + 1)), []);
+  // Reference `tick` so React knows this read participates in the re-render.
+  void tick;
+  const profile = getUserProfile();
+  const checkpoint = getCheckpoint();
+
+  if (!profile || !checkpoint) {
+    return <PracticeMissingState />;
+  }
+  return (
+    <PracticeScreenInner profile={profile} checkpoint={checkpoint} onMenu={onMenu} />
+  );
+}
+
+function PracticeMissingState() {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        background: T.bg,
+        color: T.ink,
+        fontFamily: T.fontBody,
+        display: 'grid',
+        placeItems: 'center',
+        padding: 24,
+        textAlign: 'center',
+      }}
+    >
+      <div>
+        <div style={{ fontFamily: T.fontDisplay, fontSize: 22, marginBottom: 6 }}>
+          Practice unavailable
+        </div>
+        <div style={{ color: T.muted, fontSize: 13 }}>
+          Finish onboarding to start practising.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type InnerProps = {
+  profile: UserProfile;
+  checkpoint: LearningCheckpoint;
+  onMenu?: (() => void) | undefined;
+};
+
+function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
+  const seed = useMemo(
+    () => seedExerciseFromCheckpoint(profile, checkpoint),
+    // Only seed once per profile/topic — once the user submits, the AI drives
+    // the next exercise. Re-seeding on every checkpoint write would discard
+    // the AI-supplied prompt the user is currently looking at.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const [currentExercise, setCurrentExercise] = useState<Exercise>(seed);
+  const [userAnswer, setUserAnswer] = useState('');
+  const [phase, setPhase] = useState<Phase>('input');
+  const [lastResult, setLastResult] = useState<TutorResponse | null>(null);
+  const [lastError, setLastError] = useState<string | null>(null);
+  const [errorKind, setErrorKind] = useState<
+    'no-key' | 'network-error' | 'invalid-response' | null
+  >(null);
+
+  const tutor = useTutorTurn();
+
+  // Bootstrap the first real exercise just after onboarding: when the seed
+  // has an empty sentence and we have no AI result yet, ask the tutor for one.
+  useEffect(() => {
+    if (currentExercise.sentence !== '' || lastResult || tutor.status !== 'idle') return;
+    void runTurn('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function runTurn(answer: string) {
+    setPhase('awaiting');
+    setLastError(null);
+    setErrorKind(null);
+    const result = await tutor.send({
+      userProfile: profile,
+      checkpoint,
+      currentExercise,
+      userAnswer: answer,
+    });
+    if (!result) return;
+    if (result.kind === 'ok') {
+      try {
+        mergeCheckpoint(result.response.updatedCheckpoint as Partial<LearningCheckpoint>);
+      } catch {
+        // Storage merge can throw if the checkpoint was cleared mid-flight.
+        // Treat as a soft error — keep the response in memory.
+      }
+      setLastResult(result.response);
+      // If we just bootstrapped (empty current sentence + empty answer), jump
+      // straight into input mode with the AI-supplied first exercise.
+      if (currentExercise.sentence === '' && answer === '') {
+        setCurrentExercise(result.response.nextExercise);
+        setLastResult(null);
+        setPhase('input');
+      } else {
+        setPhase('review');
+      }
+      return;
+    }
+    if (result.kind === 'no-key') {
+      setErrorKind('no-key');
+      setLastError(null);
+      setPhase('error');
+      return;
+    }
+    setErrorKind(result.kind);
+    setLastError(result.message);
+    setPhase('error');
+  }
+
+  function handleSubmit() {
+    if (phase === 'awaiting') return;
+    if (phase === 'review') {
+      // "Next" CTA — promote the AI's nextExercise and reset input.
+      if (lastResult) {
+        setCurrentExercise(lastResult.nextExercise);
+      }
+      setLastResult(null);
+      setUserAnswer('');
+      setPhase('input');
+      return;
+    }
+    if (userAnswer.trim() === '') return;
+    void runTurn(userAnswer);
+  }
+
+  function handleRetry() {
+    void runTurn(userAnswer);
+  }
+
+  const ctaLabel = phase === 'review' ? 'Next' : 'Check';
+  const placeholder =
+    phase === 'review'
+      ? 'Tap Next for new sentence…'
+      : phase === 'awaiting'
+        ? 'Checking…'
+        : 'Type your translation…';
+
+  const diffTokens = useMemo(() => {
+    if (!lastResult?.correctedAnswer) return null;
+    return diffWords(userAnswer, lastResult.correctedAnswer);
+  }, [lastResult, userAnswer]);
+
+  return (
+    <div
+      data-testid="practice-screen"
+      style={{
+        position: 'absolute',
+        inset: 0,
+        background: T.bg,
+        fontFamily: T.fontBody,
+        color: T.ink,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <TopicBar checkpoint={checkpoint} onMenu={onMenu} />
+      <ExerciseProgress checkpoint={checkpoint} />
+
+      <div
+        style={{
+          flex: 1,
+          overflow: 'auto',
+          padding: '18px 18px 96px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 10,
+        }}
+      >
+        {/* Rule bubble */}
+        <Bubble side="ai" pad="rule">
+          <div
+            style={{
+              fontFamily: T.fontMono,
+              fontSize: 10,
+              color: T.muted,
+              letterSpacing: 1.2,
+              textTransform: 'uppercase',
+              marginBottom: 6,
+            }}
+          >
+            Rule · {checkpoint.currentLearningFocus.grammarTopic}
+          </div>
+          <div style={{ fontSize: 14, lineHeight: 1.5, color: T.ink2 }}>
+            {checkpoint.lastCheckpointSummary ||
+              `Practise ${checkpoint.currentLearningFocus.grammarTopic}.`}
+          </div>
+        </Bubble>
+
+        {/* Source prompt */}
+        {currentExercise.sentence !== '' && (
+          <Bubble side="ai">
+            <div style={{ fontSize: 13, color: T.muted, marginBottom: 6 }}>
+              Translate to {profile.targetLanguage.toUpperCase()}:
+            </div>
+            <div
+              style={{
+                fontFamily: T.fontDisplay,
+                fontSize: 19,
+                fontStyle: 'italic',
+                lineHeight: 1.4,
+                color: T.ink,
+              }}
+            >
+              {currentExercise.sentence}
+            </div>
+          </Bubble>
+        )}
+
+        {/* User answer (shown once submitted) */}
+        {(phase === 'review' || phase === 'awaiting' || phase === 'error') &&
+          userAnswer.trim() !== '' && (
+            <Bubble side="user">
+              <div style={{ fontSize: 15, lineHeight: 1.5 }}>{userAnswer}</div>
+            </Bubble>
+          )}
+
+        {/* Loading placeholder while waiting on the AI */}
+        {phase === 'awaiting' && <TypingDot />}
+
+        {/* Correction bubble */}
+        {phase === 'review' && lastResult && (
+          <Bubble side="ai">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+              <Chip tone="good" size="sm">
+                <Icon.Check s={11} />
+                Reviewed
+              </Chip>
+            </div>
+            {lastResult.correctedAnswer && diffTokens && (
+              <>
+                <div
+                  style={{
+                    fontFamily: T.fontMono,
+                    fontSize: 10,
+                    color: T.muted,
+                    letterSpacing: 1.2,
+                    textTransform: 'uppercase',
+                    marginBottom: 6,
+                  }}
+                >
+                  Corrected
+                </div>
+                <div
+                  style={{
+                    padding: 12,
+                    background: T.surface2,
+                    borderRadius: 12,
+                    marginBottom: 12,
+                  }}
+                >
+                  <InlineDiff tokens={diffTokens} />
+                </div>
+              </>
+            )}
+            <div style={{ fontSize: 14, lineHeight: 1.5, color: T.ink2 }}>
+              {lastResult.messageToUser}
+            </div>
+          </Bubble>
+        )}
+
+        {/* Error states */}
+        {phase === 'error' && errorKind === 'no-key' && (
+          <Bubble side="ai">
+            <div style={{ fontSize: 14, lineHeight: 1.5, marginBottom: 10 }}>
+              Add your DeepSeek API key in Settings to start practising.
+            </div>
+            <Btn kind="primary" size="sm" onClick={() => onMenu?.()}>
+              Open Settings
+            </Btn>
+          </Bubble>
+        )}
+
+        {phase === 'error' && errorKind !== 'no-key' && (
+          <Bubble side="ai">
+            <div style={{ fontSize: 14, lineHeight: 1.5, marginBottom: 10, color: T.accentInk }}>
+              {lastError ?? 'Something went wrong.'}
+            </div>
+            <Btn kind="primary" size="sm" onClick={handleRetry}>
+              Retry
+            </Btn>
+          </Bubble>
+        )}
+      </div>
+
+      <InputDock
+        value={userAnswer}
+        onChange={setUserAnswer}
+        onSubmit={handleSubmit}
+        placeholder={placeholder}
+        cta={ctaLabel}
+        disabled={phase === 'awaiting'}
+      />
+    </div>
+  );
+}
