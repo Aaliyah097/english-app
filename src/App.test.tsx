@@ -78,10 +78,9 @@ describe('App', () => {
 
     expect(screen.getByTestId('practice-screen')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: /progress/i }));
+    await userEvent.click(screen.getByTestId('nav-settings'));
 
-    // With a seeded checkpoint, ProgressScreen renders its data view.
-    // "Current focus" is the smallest stable signal that we routed there.
-    expect(screen.getByText(/current focus/i)).toBeInTheDocument();
+    // Practice screen is no longer mounted; Settings rendered in its place.
+    expect(screen.queryByTestId('practice-screen')).not.toBeInTheDocument();
   });
 });

@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import { BottomNav, type ScreenId } from './ui';
-import {
-  OnboardingScreen,
-  PracticeScreen,
-  ProgressScreen,
-  SettingsScreen,
-} from './screens';
+import { OnboardingScreen, PracticeScreen, SettingsScreen } from './screens';
 import { getUserProfile } from './storage';
 import { useStorageSnapshot } from './storage/useStorageSnapshot';
 
@@ -17,13 +12,11 @@ import { useStorageSnapshot } from './storage/useStorageSnapshot';
 const hasProfileSelector = () => getUserProfile() != null;
 
 export function App() {
-  // Re-renders on every storage notification (profile, checkpoint, api key, etc.).
+  // Re-renders on every storage notification.
   const hasProfile = useStorageSnapshot(hasProfileSelector);
   const [active, setActive] = useState<ScreenId>('practice');
 
   if (!hasProfile) {
-    // S06 owns the real onboarding flow and calls setUserProfile itself, which
-    // notifies subscribers and re-renders us into the main app.
     return <OnboardingScreen onComplete={() => {}} />;
   }
 
@@ -31,9 +24,6 @@ export function App() {
     <>
       {active === 'practice' && (
         <PracticeScreen onMenu={() => setActive('settings')} />
-      )}
-      {active === 'progress' && (
-        <ProgressScreen onGoToPractice={() => setActive('practice')} />
       )}
       {active === 'settings' && <SettingsScreen />}
       <BottomNav active={active} onChange={setActive} />

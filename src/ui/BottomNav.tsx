@@ -1,15 +1,15 @@
 import { theme as T } from '../theme';
 import { Icon, type IconFn } from './Icon';
 
-// v1 ships three tabs only. The mockup's "Vocabulary" tab is scoped out of
-// MVP v1 — see docs/PLAN.md §7 and docs/stories/01-design-system.md.
-export type ScreenId = 'practice' | 'progress' | 'settings';
+// MVP v1 ships two tabs: Practice (the chat) and Settings. The original
+// "Vocabulary" tab was scoped out; the "Progress" tab was folded into the
+// chat itself via TopicPicker — see src/screens/practice/TopicPicker.tsx.
+export type ScreenId = 'practice' | 'settings';
 
 type Tab = { id: ScreenId; label: string; icon: IconFn };
 
 const TABS: ReadonlyArray<Tab> = [
   { id: 'practice', label: 'Practice', icon: Icon.Chat },
-  { id: 'progress', label: 'Progress', icon: Icon.Chart },
   { id: 'settings', label: 'Settings', icon: Icon.Cog },
 ];
 
@@ -51,6 +51,7 @@ export function BottomNav({ active, onChange }: Props) {
           return (
             <button
               key={tab.id}
+              data-testid={`nav-${tab.id}`}
               onClick={() => onChange(tab.id)}
               style={{
                 flex: 1,

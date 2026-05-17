@@ -11,6 +11,7 @@ import {
 import type { Exercise, LearningCheckpoint, Mistake, TutorResponse, UserProfile } from '../../types';
 import { InlineDiff } from './InlineDiff';
 import { TopicBar } from './TopicBar';
+import { TopicPicker } from './TopicPicker';
 import { diffWords } from './diff';
 import { useTutorTurn } from './useTutorTurn';
 import { defaultRuleFor } from '../progress/grammarPath';
@@ -102,6 +103,7 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
   const [phase, setPhase] = useState<Phase>('input');
   const [lastResult, setLastResult] = useState<TutorResponse | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [errorKind, setErrorKind] = useState<
     'network-error' | 'invalid-response' | null
   >(null);
@@ -174,6 +176,34 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
     void runTurn(userAnswer);
   }
 
+  function handlePickTopic(topic: string) {
+    setIsPickerOpen(false);
+    if (topic === checkpoint.currentLearningFocus.grammarTopic) return;
+    mergeCheckpoint({
+      currentLearningFocus: {
+        grammarTopic: topic,
+        difficulty: 1,
+        rule: defaultRuleFor(topic),
+      },
+      currentTopicProgress: {
+        topic,
+        completedExercises: 0,
+        knownWeaknesses: [],
+      },
+    });
+    // Reset the in-screen state so the bootstrap fires for the new topic.
+    setLastResult(null);
+    setUserAnswer('');
+    setPhase('input');
+    setCurrentExercise({
+      sourceLanguage: profile.nativeLanguage,
+      targetLanguage: profile.targetLanguage,
+      sentence: '',
+      grammarTopic: topic,
+      difficulty: 1,
+    });
+  }
+
   const placeholder = phase === 'awaiting' ? 'Checking…' : 'Type your translation…';
 
   const diffTokens = useMemo(() => {
@@ -207,10 +237,21 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
           gap: 10,
         }}
       >
-        {/* Rule bubble */}
+        {/* Rule bubble — header is a button that toggles the TopicPicker */}
         <Bubble side="ai" pad="rule">
-          <div
+          <button
+            type="button"
+            onClick={() => setIsPickerOpen((open) => !open)}
+            aria-expanded={isPickerOpen}
+            aria-label="Switch grammar topic"
             style={{
+              background: 'transparent',
+              border: 0,
+              padding: 0,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
               fontFamily: T.fontMono,
               fontSize: 10,
               color: T.muted,
@@ -220,13 +261,23 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
             }}
           >
             Rule · {checkpoint.currentLearningFocus.grammarTopic}
-          </div>
+            <span style={{ display: 'inline-flex', color: T.muted }}>
+              <Icon.Down s={12} />
+            </span>
+          </button>
           <div style={{ fontSize: 14, lineHeight: 1.5, color: T.ink2 }}>
             {checkpoint.currentLearningFocus.rule ||
               defaultRuleFor(checkpoint.currentLearningFocus.grammarTopic) ||
               checkpoint.lastCheckpointSummary ||
               `Let's practise ${checkpoint.currentLearningFocus.grammarTopic}.`}
           </div>
+          {isPickerOpen && (
+            <TopicPicker
+              currentTopic={checkpoint.currentLearningFocus.grammarTopic}
+              completedTopics={checkpoint.completedTopics}
+              onPick={handlePickTopic}
+            />
+          )}
         </Bubble>
 
         {/* Source prompt */}
