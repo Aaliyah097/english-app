@@ -236,11 +236,15 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
               Translate to {profile.targetLanguage.toUpperCase()}:
             </div>
             <div
+              // Body sans (Geist with system-ui fallback) — renders cleanly
+              // across Cyrillic/Latin/CJK without the serif italic's uneven
+              // glyph coverage. Slightly larger + medium weight so it still
+              // reads as the prompt, not a regular chat message.
               style={{
-                fontFamily: T.fontDisplay,
-                fontSize: 19,
-                fontStyle: 'italic',
-                lineHeight: 1.4,
+                fontFamily: T.fontBody,
+                fontSize: 17,
+                fontWeight: 500,
+                lineHeight: 1.5,
                 color: T.ink,
               }}
             >
