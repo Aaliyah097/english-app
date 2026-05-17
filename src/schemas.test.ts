@@ -27,6 +27,7 @@ const validCheckpoint: LearningCheckpoint = {
     knownWeaknesses: [],
   },
   lastCheckpointSummary: '',
+  mistakesByCategory: {},
 };
 
 const validResponse: TutorResponse = {
@@ -34,6 +35,7 @@ const validResponse: TutorResponse = {
   mistakes: [
     {
       type: 'Third-person singular -s',
+      category: 'third_person_s',
       example: 'the service read',
       correction: 'the service reads',
       explanation: 'A singular subject takes -s in Present Simple.',

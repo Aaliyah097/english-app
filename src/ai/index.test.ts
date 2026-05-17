@@ -17,6 +17,7 @@ const checkpoint: LearningCheckpoint = {
   completedTopics: [],
   currentTopicProgress: { topic: 'Present Simple', completedExercises: 0, knownWeaknesses: [] },
   lastCheckpointSummary: '',
+  mistakesByCategory: {},
 };
 const exercise: Exercise = {
   sourceLanguage: 'ru',

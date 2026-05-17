@@ -22,11 +22,13 @@ const baseCheckpoint: LearningCheckpoint = {
   recentMistakes: [
     {
       type: 'Article use',
+      category: 'articles' as const,
       example: 'I am developer.',
       correction: 'I am a developer.',
     },
     {
       type: 'Past tense form',
+      category: 'tense_form' as const,
       example: 'I goed home.',
       correction: 'I went home.',
     },
@@ -38,6 +40,7 @@ const baseCheckpoint: LearningCheckpoint = {
     knownWeaknesses: ['irregular verbs'],
   },
   lastCheckpointSummary: 'Working on past tense forms.',
+  mistakesByCategory: { articles: 4, tense_form: 2 },
 };
 
 beforeEach(() => {

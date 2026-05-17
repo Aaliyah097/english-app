@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { LearningCheckpoint, UserProfile } from '../types';
 import {
+  bumpMistakeCategories,
   exportAll,
   getCheckpoint,
   getUserProfile,
@@ -33,6 +34,7 @@ const checkpoint: LearningCheckpoint = {
     knownWeaknesses: [],
   },
   lastCheckpointSummary: '',
+  mistakesByCategory: {},
 };
 
 beforeEach(() => {
@@ -98,6 +100,42 @@ describe('storage — checkpoint', () => {
 
   it('mergeCheckpoint throws when no checkpoint exists', () => {
     expect(() => mergeCheckpoint({})).toThrow();
+  });
+
+  it('mergeCheckpoint preserves mistakesByCategory across AI patches', () => {
+    setCheckpoint({ ...checkpoint, mistakesByCategory: { articles: 3 } });
+    const merged = mergeCheckpoint({
+      currentLearningFocus: { grammarTopic: 'Past Simple', difficulty: 3 },
+    });
+    expect(merged.mistakesByCategory).toEqual({ articles: 3 });
+  });
+});
+
+describe('storage — bumpMistakeCategories', () => {
+  it('increments fresh categories from zero', () => {
+    setCheckpoint(checkpoint);
+    const result = bumpMistakeCategories(['articles', 'tense_form']);
+    expect(result.mistakesByCategory).toEqual({ articles: 1, tense_form: 1 });
+  });
+
+  it('deduplicates within a single call so one turn = one bump', () => {
+    setCheckpoint(checkpoint);
+    const result = bumpMistakeCategories(['articles', 'articles', 'articles']);
+    expect(result.mistakesByCategory).toEqual({ articles: 1 });
+  });
+
+  it('accumulates across calls', () => {
+    setCheckpoint(checkpoint);
+    bumpMistakeCategories(['articles']);
+    bumpMistakeCategories(['articles', 'prepositions']);
+    const c = getCheckpoint();
+    expect(c?.mistakesByCategory).toEqual({ articles: 2, prepositions: 1 });
+  });
+
+  it('is a no-op when given an empty list', () => {
+    setCheckpoint({ ...checkpoint, mistakesByCategory: { articles: 5 } });
+    const result = bumpMistakeCategories([]);
+    expect(result.mistakesByCategory).toEqual({ articles: 5 });
   });
 });
 

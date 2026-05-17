@@ -62,6 +62,7 @@ export function OnboardingScreen({ onComplete }: Props) {
         knownWeaknesses: [],
       },
       lastCheckpointSummary: '',
+      mistakesByCategory: {},
     });
 
     setUserProfile(profile);

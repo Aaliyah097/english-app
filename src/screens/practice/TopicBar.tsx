@@ -7,14 +7,14 @@ type Props = {
   onMenu?: (() => void) | undefined;
 };
 
-// Top bar showing the current grammar topic + a cog that opens Settings.
-// Ported from `TopicBar` in ai/design/project/src/practice.jsx; sources its
-// data from the LearningCheckpoint rather than mockup window globals.
+// Top bar showing the current grammar topic + a lifetime "patterns flagged"
+// chip + a cog that opens Settings. The mockup's exercise-index pill and the
+// X/Y progress bar were removed because the practice loop is intentionally
+// endless — see BACKLOG. The counter is the user's honest progress signal:
+// the slope flattens as they improve.
 export function TopicBar({ checkpoint, onMenu }: Props) {
   const topic = checkpoint.currentLearningFocus.grammarTopic;
-  const completed = checkpoint.currentTopicProgress.completedExercises;
-  // Display the next exercise index (1-based) — completed + 1.
-  const exerciseIndex = completed + 1;
+  const flagged = sumCounts(checkpoint.mistakesByCategory);
 
   return (
     <div
@@ -26,44 +26,28 @@ export function TopicBar({ checkpoint, onMenu }: Props) {
         gap: 10,
       }}
     >
-      <button
-        type="button"
+      <div
         style={{
           background: T.surface,
           border: `0.5px solid ${T.border}`,
           borderRadius: 999,
-          padding: '6px 10px 6px 8px',
+          padding: '6px 12px',
           display: 'inline-flex',
           alignItems: 'center',
           gap: 8,
           color: T.ink,
-          cursor: 'pointer',
         }}
       >
-        <div
-          style={{
-            width: 22,
-            height: 22,
-            borderRadius: 7,
-            background: T.accentBg,
-            color: T.accentInk,
-            display: 'grid',
-            placeItems: 'center',
-            fontFamily: T.fontMono,
-            fontSize: 11,
-            fontWeight: 500,
-          }}
-        >
-          {exerciseIndex}
-        </div>
+        <Icon.Sparkle s={14} />
         <div style={{ fontSize: 13, fontWeight: 500 }}>{topic}</div>
-        <Icon.Down s={14} />
-      </button>
+      </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: T.ink2 }}>
         <Chip tone="neutral" size="sm">
           <Icon.Flame s={12} />
-          <span>{completed}</span>
+          <span>
+            {flagged} {flagged === 1 ? 'flag' : 'flags'}
+          </span>
         </Chip>
         <button
           type="button"
@@ -86,4 +70,10 @@ export function TopicBar({ checkpoint, onMenu }: Props) {
       </div>
     </div>
   );
+}
+
+function sumCounts(record: Record<string, number>): number {
+  let n = 0;
+  for (const v of Object.values(record)) n += v;
+  return n;
 }

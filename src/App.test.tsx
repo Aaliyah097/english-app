@@ -36,6 +36,7 @@ const checkpoint: LearningCheckpoint = {
     knownWeaknesses: [],
   },
   lastCheckpointSummary: '',
+  mistakesByCategory: {},
 };
 
 beforeEach(() => {

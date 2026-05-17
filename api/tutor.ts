@@ -52,6 +52,7 @@ function buildSystemPrompt(profile: Req['userProfile']): string {
     '  "correctedAnswer": string,         // the corrected English sentence',
     '  "mistakes": [                      // per-turn mistakes — exactly what was wrong with THIS answer.',
     '    { "type": string,                //   short human-readable rule name (e.g. "Third-person singular -s")',
+    '      "category": string,            //   MUST be one of: third_person_s | articles | prepositions | tense_choice | tense_form | word_order | agreement | pronoun | vocabulary_choice | collocation | spelling | other',
     '      "example": string,             //   the wrong fragment from the user (e.g. "the service read")',
     '      "correction": string,          //   the fixed fragment (e.g. "the service reads")',
     '      "explanation"?: string         //   one short sentence on WHY it is wrong',
@@ -72,6 +73,7 @@ function buildSystemPrompt(profile: Req['userProfile']): string {
     '',
     'mistakes is REQUIRED. Use an empty array [] when the answer is correct.',
     'Use a DISTINCT `type` for each unique rule. If the user makes the same kind of mistake twice in one sentence (e.g. two missing articles), emit ONE mistake whose `example` and `correction` cover both spots — not two near-duplicate bullets.',
+    "category MUST be exactly one of the literal strings listed above; pick the single best fit. Use 'other' only when no listed category applies — do not invent new categories.",
     'recentMistakes MUST be an array of objects with the four named fields — never an array of strings.',
     'difficulty MUST be an integer in [1, 5].',
   ].join('\n');
