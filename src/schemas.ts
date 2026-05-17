@@ -72,6 +72,11 @@ const currentLearningFocusSchema = z.object({
   grammarTopic: z.string().min(1),
   sentenceType: z.string().optional(),
   difficulty: z.number().int().min(1).max(5),
+  // One-sentence rule explanation for the current grammar topic. Maintained
+  // by the AI: included when the topic changes (or when it's blank), omitted
+  // on subsequent turns of the same topic. Defaults to '' so old checkpoints
+  // without this field still parse.
+  rule: z.string().default(''),
 });
 
 const currentTopicProgressSchema = z.object({

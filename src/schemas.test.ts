@@ -18,7 +18,7 @@ const validProfile: UserProfile = {
 
 const validCheckpoint: LearningCheckpoint = {
   userProfile: validProfile,
-  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2 },
+  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
   recentMistakes: [],
   completedTopics: [],
   currentTopicProgress: {
@@ -43,7 +43,7 @@ const validResponse: TutorResponse = {
   ],
   correctedAnswer: 'This service reads messages from Kafka.',
   updatedCheckpoint: {
-    currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2 },
+    currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
   },
   nextExercise: {
     sourceLanguage: 'ru',

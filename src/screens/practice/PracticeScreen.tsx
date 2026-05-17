@@ -221,8 +221,9 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
             Rule · {checkpoint.currentLearningFocus.grammarTopic}
           </div>
           <div style={{ fontSize: 14, lineHeight: 1.5, color: T.ink2 }}>
-            {checkpoint.lastCheckpointSummary ||
-              `Practise ${checkpoint.currentLearningFocus.grammarTopic}.`}
+            {checkpoint.currentLearningFocus.rule ||
+              checkpoint.lastCheckpointSummary ||
+              `Let's practise ${checkpoint.currentLearningFocus.grammarTopic}.`}
           </div>
         </Bubble>
 

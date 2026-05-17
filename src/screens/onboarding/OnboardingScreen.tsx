@@ -53,7 +53,11 @@ export function OnboardingScreen({ onComplete }: Props) {
 
     const checkpoint: LearningCheckpoint = learningCheckpointSchema.parse({
       userProfile: profile,
-      currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2 },
+      currentLearningFocus: {
+        grammarTopic: 'Present Simple',
+        difficulty: 2,
+        rule: 'Use Present Simple for facts, habits, and how things normally work — e.g. "The service reads messages from Kafka."',
+      },
       recentMistakes: [],
       completedTopics: [],
       currentTopicProgress: {

@@ -18,6 +18,7 @@ const baseCheckpoint: LearningCheckpoint = {
     grammarTopic: 'Past Simple',
     sentenceType: 'statement',
     difficulty: 3,
+    rule: '',
   },
   recentMistakes: [
     {

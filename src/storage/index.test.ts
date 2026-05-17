@@ -25,7 +25,7 @@ const profile: UserProfile = {
 
 const checkpoint: LearningCheckpoint = {
   userProfile: profile,
-  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2 },
+  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
   recentMistakes: [],
   completedTopics: [],
   currentTopicProgress: {
@@ -75,11 +75,12 @@ describe('storage — checkpoint', () => {
   it('mergeCheckpoint shallow-merges nested currentLearningFocus', () => {
     setCheckpoint(checkpoint);
     const merged = mergeCheckpoint({
-      currentLearningFocus: { grammarTopic: 'Past Simple', difficulty: 3 },
+      currentLearningFocus: { grammarTopic: 'Past Simple', difficulty: 3, rule: '' },
     });
     expect(merged.currentLearningFocus).toEqual({
       grammarTopic: 'Past Simple',
       difficulty: 3,
+      rule: '',
     });
     // Top-level untouched fields preserved.
     expect(merged.userProfile).toEqual(profile);
@@ -105,7 +106,7 @@ describe('storage — checkpoint', () => {
   it('mergeCheckpoint preserves mistakesByCategory across AI patches', () => {
     setCheckpoint({ ...checkpoint, mistakesByCategory: { articles: 3 } });
     const merged = mergeCheckpoint({
-      currentLearningFocus: { grammarTopic: 'Past Simple', difficulty: 3 },
+      currentLearningFocus: { grammarTopic: 'Past Simple', difficulty: 3, rule: '' },
     });
     expect(merged.mistakesByCategory).toEqual({ articles: 3 });
   });

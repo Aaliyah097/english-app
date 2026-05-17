@@ -12,7 +12,7 @@ const profile: UserProfile = {
 };
 const checkpoint: LearningCheckpoint = {
   userProfile: profile,
-  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2 },
+  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
   recentMistakes: [],
   completedTopics: [],
   currentTopicProgress: { topic: 'Present Simple', completedExercises: 0, knownWeaknesses: [] },
