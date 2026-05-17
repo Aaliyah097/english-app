@@ -1,0 +1,69 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`buildSystemPrompt > produces a stable snapshot 1`] = `
+"You are an AI English tutor.
+The user's native language is "ru". They are practising "en" at level "intermediate".
+Their goal: work.
+The user translates short sentences from their native language into English.
+Focus on tenses, conditionals, articles, prepositions, and natural conversational English.
+
+Keep explanations short and practical. Do not give long theory.
+Correct mistakes clearly. Suggest a more natural alternative only when useful.
+Update the checkpoint compactly — only fields that actually changed.
+Generate the next exercise based on the topic, current grammar focus, level, and repeated mistakes.
+
+Return JSON only with: messageToUser, correctedAnswer, updatedCheckpoint, nextExercise.
+No prose. No markdown fences."
+`;
+
+exports[`buildTurnUserPrompt > produces a stable snapshot 1`] = `
+"# USER_PROFILE
+{
+  "nativeLanguage": "ru",
+  "targetLanguage": "en",
+  "level": "intermediate",
+  "interests": [
+    "software development"
+  ],
+  "goal": "work",
+  "preferredPracticeMode": "translation"
+}
+
+# CHECKPOINT
+{
+  "userProfile": {
+    "nativeLanguage": "ru",
+    "targetLanguage": "en",
+    "level": "intermediate",
+    "interests": [
+      "software development"
+    ],
+    "goal": "work",
+    "preferredPracticeMode": "translation"
+  },
+  "currentLearningFocus": {
+    "grammarTopic": "Present Simple",
+    "difficulty": 2
+  },
+  "recentMistakes": [],
+  "completedTopics": [],
+  "currentTopicProgress": {
+    "topic": "Present Simple",
+    "completedExercises": 3,
+    "knownWeaknesses": []
+  },
+  "lastCheckpointSummary": ""
+}
+
+# CURRENT_EXERCISE
+{
+  "sourceLanguage": "ru",
+  "targetLanguage": "en",
+  "sentence": "Этот сервис читает сообщения из Kafka.",
+  "grammarTopic": "Present Simple",
+  "difficulty": 2
+}
+
+# USER_ANSWER
+"This service read messages from the Kafka.""
+`;
