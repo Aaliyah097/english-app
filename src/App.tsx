@@ -29,7 +29,9 @@ export function App() {
 
   return (
     <>
-      {active === 'practice' && <PracticeScreen />}
+      {active === 'practice' && (
+        <PracticeScreen onMenu={() => setActive('settings')} />
+      )}
       {active === 'progress' && (
         <ProgressScreen onGoToPractice={() => setActive('practice')} />
       )}

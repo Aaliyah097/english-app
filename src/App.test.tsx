@@ -1,9 +1,17 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
-import { setUserProfile } from './storage';
-import type { UserProfile } from './types';
+import { setCheckpoint, setUserProfile } from './storage';
+import type { LearningCheckpoint, UserProfile } from './types';
+
+vi.mock('./ai', async () => {
+  const actual = await vi.importActual<typeof import('./ai')>('./ai');
+  return {
+    ...actual,
+    requestTutorTurn: vi.fn(async () => ({ kind: 'no-key' as const })),
+  };
+});
 
 const profile: UserProfile = {
   nativeLanguage: 'ru',
@@ -12,6 +20,19 @@ const profile: UserProfile = {
   interests: ['software development'],
   goal: 'work',
   preferredPracticeMode: 'translation',
+};
+
+const checkpoint: LearningCheckpoint = {
+  userProfile: profile,
+  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2 },
+  recentMistakes: [],
+  completedTopics: [],
+  currentTopicProgress: {
+    topic: 'Present Simple',
+    completedExercises: 0,
+    knownWeaknesses: [],
+  },
+  lastCheckpointSummary: '',
 };
 
 beforeEach(() => {
@@ -32,6 +53,7 @@ describe('App', () => {
   });
 
   it('renders the practice screen once a profile exists', () => {
+    setCheckpoint(checkpoint);
     render(<App />);
     expect(screen.getByRole('button', { name: /begin/i })).toBeInTheDocument();
 
@@ -41,28 +63,21 @@ describe('App', () => {
       setUserProfile(profile);
     });
 
-    expect(screen.getByTestId('screen-placeholder')).toHaveAttribute(
-      'data-screen',
-      'Practice',
-    );
+    expect(screen.getByTestId('practice-screen')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /practice/i })).toBeInTheDocument();
   });
 
   it('switches the active screen when a BottomNav tab is clicked', async () => {
     setUserProfile(profile);
+    setCheckpoint(checkpoint);
     render(<App />);
 
-    expect(screen.getByTestId('screen-placeholder')).toHaveAttribute(
-      'data-screen',
-      'Practice',
-    );
+    expect(screen.getByTestId('practice-screen')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: /progress/i }));
 
-    // S10 replaced the Progress placeholder with the real screen — its empty
-    // state copy is the smallest stable signal that we routed there.
-    expect(
-      screen.getByText(/start practising to see your progress/i),
-    ).toBeInTheDocument();
+    // With a seeded checkpoint, ProgressScreen renders its data view.
+    // "Current focus" is the smallest stable signal that we routed there.
+    expect(screen.getByText(/current focus/i)).toBeInTheDocument();
   });
 });
