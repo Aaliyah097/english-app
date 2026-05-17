@@ -62,6 +62,28 @@ describe('schemas', () => {
     expect(partialLearningCheckpointSchema.parse({})).toEqual({});
   });
 
+  it('partialLearningCheckpointSchema accepts partial nested objects', () => {
+    // The AI commonly sends only the inner fields that changed (e.g. just
+    // completedExercises + knownWeaknesses, omitting topic). This must parse —
+    // the storage layer's mergeCheckpoint deep-merges before re-validating
+    // against the strict schema.
+    const partialPatch = {
+      currentTopicProgress: {
+        completedExercises: 4,
+        knownWeaknesses: ['articles with general plurals'],
+      },
+    };
+    expect(partialLearningCheckpointSchema.safeParse(partialPatch).success).toBe(true);
+  });
+
+  it('full learningCheckpointSchema still requires nested fields', () => {
+    const incomplete = {
+      ...validCheckpoint,
+      currentTopicProgress: { completedExercises: 4, knownWeaknesses: [] },
+    };
+    expect(learningCheckpointSchema.safeParse(incomplete).success).toBe(false);
+  });
+
   it('tutorResponseSchema accepts a valid response', () => {
     expect(tutorResponseSchema.parse(validResponse)).toEqual(validResponse);
   });

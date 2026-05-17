@@ -36,24 +36,43 @@ export const exerciseSchema = z.object({
   difficulty: z.number().int().min(1).max(5),
 });
 
+const currentLearningFocusSchema = z.object({
+  grammarTopic: z.string().min(1),
+  sentenceType: z.string().optional(),
+  difficulty: z.number().int().min(1).max(5),
+});
+
+const currentTopicProgressSchema = z.object({
+  topic: z.string().min(1),
+  completedExercises: z.number().int().min(0),
+  knownWeaknesses: z.array(z.string()),
+});
+
 export const learningCheckpointSchema = z.object({
   userProfile: userProfileSchema,
-  currentLearningFocus: z.object({
-    grammarTopic: z.string().min(1),
-    sentenceType: z.string().optional(),
-    difficulty: z.number().int().min(1).max(5),
-  }),
+  currentLearningFocus: currentLearningFocusSchema,
   recentMistakes: z.array(mistakeSchema),
   completedTopics: z.array(z.string()),
-  currentTopicProgress: z.object({
-    topic: z.string().min(1),
-    completedExercises: z.number().int().min(0),
-    knownWeaknesses: z.array(z.string()),
-  }),
+  currentTopicProgress: currentTopicProgressSchema,
   lastCheckpointSummary: z.string(),
 });
 
-export const partialLearningCheckpointSchema = learningCheckpointSchema.partial();
+// Patch shape the AI returns in `updatedCheckpoint`. Both top-level keys AND
+// the two nested objects are partial — the model commonly sends only the
+// inner fields that changed. `mergeCheckpoint` in src/storage shallow-merges
+// the nested objects against the stored checkpoint, then re-validates the
+// whole thing against learningCheckpointSchema, so the strict invariant
+// still holds after the merge.
+export const partialLearningCheckpointSchema = z
+  .object({
+    userProfile: userProfileSchema,
+    currentLearningFocus: currentLearningFocusSchema.partial(),
+    recentMistakes: z.array(mistakeSchema),
+    completedTopics: z.array(z.string()),
+    currentTopicProgress: currentTopicProgressSchema.partial(),
+    lastCheckpointSummary: z.string(),
+  })
+  .partial();
 
 export const tutorResponseSchema = z.object({
   messageToUser: z.string().min(1),
