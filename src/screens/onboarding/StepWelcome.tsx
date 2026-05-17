@@ -85,12 +85,13 @@ export function StepWelcome() {
           {t(locale, 'onboarding.welcome.sampleLabel')}
         </div>
         <div style={{ color: T.ink2, fontSize: 14, marginBottom: 8, lineHeight: 1.4 }}>
-          Она пьёт кофе каждое утро.
+          Каждое утро она пьёт кофе и читает газету на балконе.
         </div>
         <div style={{ height: 0.5, background: T.border, margin: '12px -18px' }} />
         <div style={{ color: T.ink, fontSize: 14, lineHeight: 1.4 }}>
-          She <span style={{ color: T.accent, fontWeight: 500 }}>drinks</span> coffee every
-          morning.
+          She <span style={{ color: T.accent, fontWeight: 500 }}>drinks</span> coffee and{' '}
+          <span style={{ color: T.accent, fontWeight: 500 }}>reads</span> the newspaper on
+          the balcony every morning.
         </div>
       </div>
     </div>
