@@ -110,13 +110,30 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
 
   const tutor = useTutorTurn();
 
-  // Bootstrap the first real exercise just after onboarding: when the seed
-  // has an empty sentence and we have no AI result yet, ask the tutor for one.
+  // Bootstrap a fresh exercise whenever the source/target language pair on
+  // the current exercise no longer matches the user's profile (e.g. they
+  // just switched their learning language in Settings). Resetting to a seed
+  // with an empty sentence lets the bootstrap effect below pick it up.
+  useEffect(() => {
+    if (
+      currentExercise.sourceLanguage === profile.nativeLanguage &&
+      currentExercise.targetLanguage === profile.targetLanguage
+    )
+      return;
+    setCurrentExercise(seedExerciseFromCheckpoint(profile, checkpoint));
+    setLastResult(null);
+    setUserAnswer('');
+    setPhase('input');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile.nativeLanguage, profile.targetLanguage]);
+
+  // Bootstrap the first real exercise — runs both at mount and whenever the
+  // language-change effect above resets sentence back to ''.
   useEffect(() => {
     if (currentExercise.sentence !== '' || lastResult || tutor.status !== 'idle') return;
     void runTurn('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentExercise.sentence, lastResult, tutor.status]);
 
   async function runTurn(answer: string) {
     setPhase('awaiting');
@@ -131,7 +148,7 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
     if (!result) return;
     if (result.kind === 'ok') {
       try {
-        mergeCheckpoint(result.response.updatedCheckpoint as Partial<LearningCheckpoint>);
+        mergeCheckpoint(result.response.updatedCheckpoint);
         // Bump lifetime per-category counters for THIS turn's mistakes. Each
         // category is counted at most once per turn (handled inside the helper).
         const cats = result.response.mistakes.map((m) => m.category);

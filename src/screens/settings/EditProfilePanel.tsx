@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
-import { getUserProfile, setUserProfile, subscribe } from '../../storage';
+import {
+  getCheckpoint,
+  getUserProfile,
+  mergeCheckpoint,
+  setUserProfile,
+  subscribe,
+} from '../../storage';
 import { theme as T } from '../../theme';
 import type { Level, UserProfile } from '../../types';
 import { Icon } from '../../ui';
@@ -64,7 +70,20 @@ export function EditProfilePanel() {
     updateProfile({ interests: next });
   };
 
-  const setTargetLanguage = (code: string) => updateProfile({ targetLanguage: code });
+  const setTargetLanguage = (code: string) => {
+    if (code === profile.targetLanguage) return;
+    updateProfile({ targetLanguage: code });
+    // The persisted rule, last-checkpoint summary, and recent-mistakes log
+    // are all in the *previous* target language. Clear them so the AI
+    // regenerates fresh in-language content on the next turn.
+    if (getCheckpoint()) {
+      mergeCheckpoint({
+        currentLearningFocus: { rule: '' },
+        lastCheckpointSummary: '',
+        recentMistakes: [],
+      });
+    }
+  };
   const setLevel = (level: Level) => updateProfile({ level });
   const setGoal = (goal: string) => updateProfile({ goal });
 

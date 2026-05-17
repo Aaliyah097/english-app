@@ -13,7 +13,7 @@ import {
   partialLearningCheckpointSchema,
   userProfileSchema,
 } from '../schemas';
-import type { LearningCheckpoint, UserProfile } from '../types';
+import type { LearningCheckpoint, PartialLearningCheckpoint, UserProfile } from '../types';
 import { KEY_PREFIX, SCHEMA_VERSION, STORAGE_KEYS } from './keys';
 
 // ── low-level helpers ──────────────────────────────────────────────────────
@@ -79,7 +79,7 @@ export function setCheckpoint(c: LearningCheckpoint): void {
  * is replaced wholesale by the patch.
  */
 export function mergeCheckpoint(
-  patch: Partial<LearningCheckpoint>,
+  patch: PartialLearningCheckpoint,
 ): LearningCheckpoint {
   const current = getCheckpoint();
   if (!current) {
@@ -89,7 +89,11 @@ export function mergeCheckpoint(
   // Validate the patch shape before merging — catches obviously bad updates.
   partialLearningCheckpointSchema.parse(patch);
 
-  const merged: LearningCheckpoint = {
+  // Spreading a deep-partial patch over a full checkpoint produces fields
+  // typed as `T | undefined` in TS, even though at runtime the spread just
+  // overwrites with whatever the patch provides. Zod re-validates below so
+  // the runtime guarantee holds; the cast tells TS we know that.
+  const merged = {
     ...current,
     ...patch,
     currentLearningFocus: {
@@ -103,7 +107,7 @@ export function mergeCheckpoint(
     // mistakesByCategory is client-owned (see bumpMistakeCategories). Never
     // let an AI patch touch it.
     mistakesByCategory: current.mistakesByCategory,
-  };
+  } as LearningCheckpoint;
 
   const validated = learningCheckpointSchema.parse(merged);
   writeJson(STORAGE_KEYS.checkpoint, validated);
