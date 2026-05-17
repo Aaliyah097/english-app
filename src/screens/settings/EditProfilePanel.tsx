@@ -1,24 +1,18 @@
-import { getUserProfile, setUserProfile } from '../../storage';
-import { useStorageSnapshot } from '../../storage/useStorageSnapshot';
+import { useEffect, useState } from 'react';
+import { getUserProfile, setUserProfile, subscribe } from '../../storage';
 import { theme as T } from '../../theme';
 import type { Level, UserProfile } from '../../types';
 import { Icon } from '../../ui';
-import { ALL_INTERESTS, GOALS, LEVELS } from '../onboarding/options';
+import { ALL_INTERESTS, GOALS, LEVELS, NATIVE_LANGUAGES } from '../onboarding/options';
 
-// useSyncExternalStore requires snapshot identity to be stable across reads
-// unless the underlying data actually changed. getUserProfile() deserialises
-// a fresh object each call, so we cache by serialised value and return the
-// same reference until the data really differs.
-let cachedProfileJson: string | null = null;
-let cachedProfile: UserProfile | null = null;
-const stableProfileSelector = (): UserProfile | null => {
-  const next = getUserProfile();
-  const nextJson = next === null ? null : JSON.stringify(next);
-  if (nextJson === cachedProfileJson) return cachedProfile;
-  cachedProfileJson = nextJson;
-  cachedProfile = next;
-  return cachedProfile;
-};
+// Re-read on every storage notification. Same pattern as PracticeScreen —
+// simpler than wrangling useSyncExternalStore + a stable selector, and
+// reliable in practice because the profile object is small.
+function useProfile(): UserProfile | null {
+  const [, setTick] = useState(0);
+  useEffect(() => subscribe(() => setTick((n) => n + 1)), []);
+  return getUserProfile();
+}
 
 function PanelCard({ children }: { children: React.ReactNode }) {
   return (
@@ -56,7 +50,7 @@ function SubLabel({ children }: { children: React.ReactNode }) {
 }
 
 export function EditProfilePanel() {
-  const profile = useStorageSnapshot(stableProfileSelector);
+  const profile = useProfile();
   if (!profile) return null;
 
   const updateProfile = (patch: Partial<UserProfile>) => {
@@ -70,11 +64,50 @@ export function EditProfilePanel() {
     updateProfile({ interests: next });
   };
 
+  const setNativeLanguage = (code: string) => updateProfile({ nativeLanguage: code });
   const setLevel = (level: Level) => updateProfile({ level });
   const setGoal = (goal: string) => updateProfile({ goal });
 
   return (
     <PanelCard>
+      <div>
+        <SubLabel>Native language</SubLabel>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
+          {NATIVE_LANGUAGES.map((l) => {
+            const on = profile.nativeLanguage === l.code;
+            return (
+              <button
+                key={l.code}
+                type="button"
+                onClick={() => setNativeLanguage(l.code)}
+                aria-pressed={on}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: on ? T.ink : T.surface,
+                  color: on ? T.bg : T.ink,
+                  border: `0.5px solid ${on ? T.ink : T.border}`,
+                  borderRadius: 16,
+                  padding: '12px 16px',
+                  fontFamily: T.fontBody,
+                  fontSize: 14.5,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <span>{l.name}</span>
+                  <span style={{ fontSize: 12, opacity: 0.6, fontWeight: 400 }}>{l.en}</span>
+                </span>
+                {on && <Icon.Check s={16} />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div>
         <SubLabel>Interests</SubLabel>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>

@@ -3,6 +3,15 @@
 
 import type { Level } from '../../types';
 
+export const NATIVE_LANGUAGES: ReadonlyArray<{ code: string; name: string; en: string }> = [
+  { code: 'ru', name: 'Русский', en: 'Russian' },
+  { code: 'es', name: 'Español', en: 'Spanish' },
+  { code: 'de', name: 'Deutsch', en: 'German' },
+  { code: 'fr', name: 'Français', en: 'French' },
+  { code: 'pt', name: 'Português', en: 'Portuguese' },
+  { code: 'ja', name: '日本語', en: 'Japanese' },
+];
+
 export const ALL_INTERESTS: ReadonlyArray<string> = [
   'Software dev',
   'Architecture',
