@@ -42,6 +42,7 @@ function buildSystemPrompt(profile: Req['userProfile']): string {
     '',
     'Keep explanations short and practical. Do not give long theory.',
     'Correct mistakes clearly. Suggest a more natural alternative only when useful.',
+    "Ignore missing or extra terminal punctuation at the very end of the user's sentence (period, question mark, exclamation mark). Do not list it as a mistake. Still include correct terminal punctuation in `correctedAnswer`.",
     'Update the checkpoint compactly — only fields that actually changed.',
     'Generate the next exercise based on the topic, current grammar focus, level, and repeated mistakes.',
     '',
