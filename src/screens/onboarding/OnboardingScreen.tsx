@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { learningCheckpointSchema, userProfileSchema } from '../../schemas';
-import { setCheckpoint, setUserProfile } from '../../storage';
+import { setCheckpoint } from '../../storage';
 import { theme as T } from '../../theme';
 import type { LearningCheckpoint, Level, UserProfile } from '../../types';
 import { Btn, Icon } from '../../ui';
@@ -71,7 +71,7 @@ export function OnboardingScreen({ onComplete }: Props) {
       mistakesByCategory: {},
     });
 
-    setUserProfile(profile);
+    // Single write — the checkpoint carries the profile as a nested field.
     setCheckpoint(checkpoint);
     onComplete?.();
   };

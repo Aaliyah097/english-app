@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { setCheckpoint, setUserProfile } from '../../storage';
+import { setCheckpoint } from '../../storage';
 import type {
   Exercise,
   LearningCheckpoint,
@@ -105,7 +105,7 @@ function reviewResponse(
 
 beforeEach(() => {
   localStorage.clear();
-  setUserProfile(profile);
+  // setCheckpoint carries the profile via the nested userProfile field.
   setCheckpoint(checkpoint);
   mockedRequest.mockReset();
 });

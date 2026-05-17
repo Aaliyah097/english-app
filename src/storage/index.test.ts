@@ -45,23 +45,29 @@ afterEach(() => {
   localStorage.clear();
 });
 
-describe('storage — profile', () => {
-  it('round-trips through set → get', () => {
+describe('storage — profile (derived from the checkpoint)', () => {
+  it('returns null when no checkpoint exists', () => {
     expect(getUserProfile()).toBeNull();
-    setUserProfile(profile);
+  });
+
+  it('reads the profile out of the checkpoint', () => {
+    setCheckpoint(checkpoint);
     expect(getUserProfile()).toEqual(profile);
   });
 
-  it('returns null when stored JSON is malformed', () => {
-    localStorage.setItem(STORAGE_KEYS.profile, '{not json');
-    expect(getUserProfile()).toBeNull();
+  it('round-trips through setUserProfile when a checkpoint exists', () => {
+    setCheckpoint(checkpoint);
+    const updated: UserProfile = { ...profile, targetLanguage: 'es' };
+    setUserProfile(updated);
+    expect(getUserProfile()).toEqual(updated);
   });
 
-  it('returns null when stored data fails schema validation', () => {
-    localStorage.setItem(
-      STORAGE_KEYS.profile,
-      JSON.stringify({ nativeLanguage: 'ru' }),
-    );
+  it('throws when setUserProfile is called without a checkpoint', () => {
+    expect(() => setUserProfile(profile)).toThrow(/no checkpoint/);
+  });
+
+  it('returns null when stored checkpoint JSON is malformed', () => {
+    localStorage.setItem(STORAGE_KEYS.checkpoint, '{not json');
     expect(getUserProfile()).toBeNull();
   });
 });
@@ -113,11 +119,6 @@ describe('storage — checkpoint', () => {
     expect(stored?.currentLearningFocus.grammarTopic).toBe('Present Simple');
   });
 
-  it('setUserProfile is a no-op on the checkpoint when none exists', () => {
-    setUserProfile(profile);
-    expect(getCheckpoint()).toBeNull();
-  });
-
   it('mergeCheckpoint preserves mistakesByCategory across AI patches', () => {
     setCheckpoint({ ...checkpoint, mistakesByCategory: { articles: 3 } });
     const merged = mergeCheckpoint({
@@ -156,37 +157,35 @@ describe('storage — bumpMistakeCategories', () => {
 });
 
 describe('storage — export/import/reset', () => {
-  it('exportAll → importAll round-trips profile + checkpoint', () => {
-    setUserProfile(profile);
+  it('exportAll → importAll round-trips the checkpoint (carrying the profile)', () => {
     setCheckpoint(checkpoint);
     const exported = exportAll();
 
     localStorage.clear();
-    expect(getUserProfile()).toBeNull();
+    expect(getCheckpoint()).toBeNull();
 
     importAll(exported);
-    expect(getUserProfile()).toEqual(profile);
     expect(getCheckpoint()).toEqual(checkpoint);
+    expect(getUserProfile()).toEqual(profile);
   });
 
   it('importAll rejects malformed JSON without touching existing state', () => {
-    setUserProfile(profile);
+    setCheckpoint(checkpoint);
     expect(() => importAll('not json')).toThrow(/JSON/);
-    expect(getUserProfile()).toEqual(profile);
+    expect(getCheckpoint()).toEqual(checkpoint);
   });
 
   it('importAll rejects wrong schema without touching existing state', () => {
-    setUserProfile(profile);
+    setCheckpoint(checkpoint);
     expect(() => importAll('{"schemaVersion":99}')).toThrow();
-    expect(getUserProfile()).toEqual(profile);
+    expect(getCheckpoint()).toEqual(checkpoint);
   });
 
-  it('resetAll clears profile and checkpoint', () => {
-    setUserProfile(profile);
+  it('resetAll clears the checkpoint', () => {
     setCheckpoint(checkpoint);
     resetAll();
-    expect(getUserProfile()).toBeNull();
     expect(getCheckpoint()).toBeNull();
+    expect(getUserProfile()).toBeNull();
   });
 });
 
@@ -194,8 +193,8 @@ describe('storage — pub-sub', () => {
   it('subscribe receives a notification on every setter', () => {
     const listener = vi.fn();
     const unsubscribe = subscribe(listener);
-    setUserProfile(profile);
     setCheckpoint(checkpoint);
+    setUserProfile({ ...profile, targetLanguage: 'es' });
     expect(listener.mock.calls.length).toBeGreaterThanOrEqual(2);
     unsubscribe();
     listener.mockClear();

@@ -49,29 +49,7 @@ export function subscribe(listener: () => void): () => void {
   };
 }
 
-// ── profile ────────────────────────────────────────────────────────────────
-
-export function getUserProfile(): UserProfile | null {
-  return readJson(STORAGE_KEYS.profile, userProfileSchema);
-}
-
-export function setUserProfile(p: UserProfile): void {
-  const validated = userProfileSchema.parse(p);
-  writeJson(STORAGE_KEYS.profile, validated);
-  // The checkpoint stores a denormalised copy of the profile so the AI
-  // prompt sees a self-contained snapshot. Keep it in sync — otherwise
-  // the AI receives stale languages/interests after a profile edit.
-  const checkpoint = getCheckpoint();
-  if (checkpoint) {
-    writeJson(STORAGE_KEYS.checkpoint, {
-      ...checkpoint,
-      userProfile: validated,
-    });
-  }
-  notify();
-}
-
-// ── checkpoint ─────────────────────────────────────────────────────────────
+// ── checkpoint (single source of truth) ────────────────────────────────────
 
 export function getCheckpoint(): LearningCheckpoint | null {
   return readJson(STORAGE_KEYS.checkpoint, learningCheckpointSchema);
@@ -79,6 +57,31 @@ export function getCheckpoint(): LearningCheckpoint | null {
 
 export function setCheckpoint(c: LearningCheckpoint): void {
   writeJson(STORAGE_KEYS.checkpoint, learningCheckpointSchema.parse(c));
+  notify();
+}
+
+// ── profile (derived from the checkpoint) ──────────────────────────────────
+//
+// The profile is a nested field on LearningCheckpoint. These helpers exist
+// so callers can read/write profile without knowing the larger shape.
+
+export function getUserProfile(): UserProfile | null {
+  return getCheckpoint()?.userProfile ?? null;
+}
+
+/**
+ * Updates the nested userProfile on the existing checkpoint. Requires a
+ * checkpoint to already exist — onboarding writes the initial state via
+ * `setCheckpoint` (which carries the first profile), and every later edit
+ * goes through here.
+ */
+export function setUserProfile(p: UserProfile): void {
+  const validated = userProfileSchema.parse(p);
+  const current = getCheckpoint();
+  if (!current) {
+    throw new Error('setUserProfile: no checkpoint stored yet — call setCheckpoint first');
+  }
+  writeJson(STORAGE_KEYS.checkpoint, { ...current, userProfile: validated });
   notify();
 }
 
@@ -161,21 +164,19 @@ export function bumpMistakeCategories(
 
 const exportEnvelopeSchema = z.object({
   schemaVersion: z.literal(SCHEMA_VERSION),
-  profile: userProfileSchema.nullable(),
   checkpoint: learningCheckpointSchema.nullable(),
 });
 
 export function exportAll(): string {
   const envelope = {
     schemaVersion: SCHEMA_VERSION,
-    profile: getUserProfile(),
     checkpoint: getCheckpoint(),
   };
   return JSON.stringify(envelope, null, 2);
 }
 
 /**
- * Replaces profile + checkpoint with the contents of an export envelope.
+ * Replaces the stored checkpoint with the contents of an export envelope.
  * Throws on invalid JSON or schema mismatch — leaves existing state intact.
  */
 export function importAll(json: string): void {
@@ -189,12 +190,11 @@ export function importAll(json: string): void {
   if (!result.success) {
     throw new Error(`Import failed: ${result.error.issues[0]?.message ?? 'schema mismatch'}`);
   }
-  // Validation passed — commit both writes atomically (notify once at end).
-  const { profile, checkpoint } = result.data;
-  if (profile) writeJson(STORAGE_KEYS.profile, profile);
-  else localStorage.removeItem(STORAGE_KEYS.profile);
-  if (checkpoint) writeJson(STORAGE_KEYS.checkpoint, checkpoint);
-  else localStorage.removeItem(STORAGE_KEYS.checkpoint);
+  if (result.data.checkpoint) {
+    writeJson(STORAGE_KEYS.checkpoint, result.data.checkpoint);
+  } else {
+    localStorage.removeItem(STORAGE_KEYS.checkpoint);
+  }
   notify();
 }
 

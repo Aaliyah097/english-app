@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { userProfileSchema } from '../../schemas';
-import { getUserProfile, setUserProfile } from '../../storage';
-import type { UserProfile } from '../../types';
+import { learningCheckpointSchema, userProfileSchema } from '../../schemas';
+import { getUserProfile, setCheckpoint } from '../../storage';
+import type { LearningCheckpoint, UserProfile } from '../../types';
 import { SettingsScreen } from './SettingsScreen';
 
 const SAMPLE_PROFILE: UserProfile = userProfileSchema.parse({
@@ -15,10 +15,24 @@ const SAMPLE_PROFILE: UserProfile = userProfileSchema.parse({
   preferredPracticeMode: 'translation',
 });
 
+const SAMPLE_CHECKPOINT: LearningCheckpoint = learningCheckpointSchema.parse({
+  userProfile: SAMPLE_PROFILE,
+  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
+  recentMistakes: [],
+  completedTopics: [],
+  currentTopicProgress: {
+    topic: 'Present Simple',
+    completedExercises: 0,
+    knownWeaknesses: [],
+  },
+  lastCheckpointSummary: '',
+  mistakesByCategory: {},
+});
+
 describe('SettingsScreen', () => {
   beforeEach(() => {
     localStorage.clear();
-    setUserProfile(SAMPLE_PROFILE);
+    setCheckpoint(SAMPLE_CHECKPOINT);
   });
 
   afterEach(() => {

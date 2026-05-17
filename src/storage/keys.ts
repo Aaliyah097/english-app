@@ -6,7 +6,9 @@ export const SCHEMA_VERSION = 1 as const;
 const NS = `englishly:v${SCHEMA_VERSION}` as const;
 
 export const STORAGE_KEYS = {
-  profile: `${NS}:profile`,
+  // Everything the user owns lives in a single `checkpoint` blob — including
+  // the nested `userProfile`. The previous standalone `:profile` key has been
+  // retired; getUserProfile/setUserProfile now read and write through here.
   checkpoint: `${NS}:checkpoint`,
 } as const;
 

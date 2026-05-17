@@ -2,7 +2,7 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
-import { setCheckpoint, setUserProfile } from './storage';
+import { setCheckpoint } from './storage';
 import type { LearningCheckpoint, UserProfile } from './types';
 
 vi.mock('./ai', async () => {
@@ -56,22 +56,20 @@ describe('App', () => {
     expect(screen.queryByTestId('screen-placeholder')).not.toBeInTheDocument();
   });
 
-  it('renders the practice screen once a profile exists', () => {
-    setCheckpoint(checkpoint);
+  it('renders the practice screen once a checkpoint exists', () => {
     render(<App />);
     expect(screen.getByRole('button', { name: /begin/i })).toBeInTheDocument();
 
-    // Writing a profile notifies subscribers — App should re-render into the
-    // main shell with Practice as the default tab.
+    // Writing the checkpoint (which carries the profile) notifies subscribers
+    // and flips the App out of onboarding into the main shell.
     act(() => {
-      setUserProfile(profile);
+      setCheckpoint(checkpoint);
     });
 
     expect(screen.getByTestId('practice-screen')).toBeInTheDocument();
   });
 
   it('opens Settings from the TopicBar cog and returns via Back', async () => {
-    setUserProfile(profile);
     setCheckpoint(checkpoint);
     render(<App />);
 
