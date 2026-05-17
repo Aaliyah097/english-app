@@ -13,6 +13,7 @@ import { InlineDiff } from './InlineDiff';
 import { TopicBar } from './TopicBar';
 import { diffWords } from './diff';
 import { useTutorTurn } from './useTutorTurn';
+import { defaultRuleFor } from '../progress/grammarPath';
 
 type Props = {
   onMenu?: (() => void) | undefined;
@@ -222,6 +223,7 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
           </div>
           <div style={{ fontSize: 14, lineHeight: 1.5, color: T.ink2 }}>
             {checkpoint.currentLearningFocus.rule ||
+              defaultRuleFor(checkpoint.currentLearningFocus.grammarTopic) ||
               checkpoint.lastCheckpointSummary ||
               `Let's practise ${checkpoint.currentLearningFocus.grammarTopic}.`}
           </div>

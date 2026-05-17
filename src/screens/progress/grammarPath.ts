@@ -20,6 +20,44 @@ export const GRAMMAR_PATH = [
 
 export type GrammarTopic = (typeof GRAMMAR_PATH)[number];
 
+// Short fallback rule for each canonical topic. Used when the checkpoint's
+// currentLearningFocus.rule is empty — either an old stored checkpoint or a
+// turn where the AI didn't include the rule field. Keep these terse; the AI
+// is allowed to override with something more tailored.
+const DEFAULT_RULES: Record<string, string> = {
+  'Present Simple':
+    'Use Present Simple for facts, habits, and how things normally work — e.g. "The service reads messages from Kafka."',
+  'Present Continuous':
+    'Use Present Continuous for actions happening now or around now — e.g. "I\'m debugging the consumer."',
+  'Past Simple':
+    'Use Past Simple for finished actions at a specific past time — e.g. "We deployed the fix yesterday."',
+  'Future Simple':
+    "Use `will` for spontaneous decisions and predictions, `be going to` for plans — e.g. \"I'll handle it.\" / \"We're going to scale up.\"",
+  'Present Perfect':
+    'Use Present Perfect for past actions still connected to now — e.g. "We\'ve already shipped that."',
+  'Present Perfect vs Past Simple':
+    'Past Simple for a finished moment ("we shipped Tuesday"); Present Perfect for an unfinished time or recent relevance ("we\'ve shipped it").',
+  'Past Continuous':
+    'Use Past Continuous for an action in progress in the past, often interrupted — e.g. "I was reviewing the PR when it failed."',
+  'Compound sentences':
+    'Join two independent clauses with `and`, `but`, `or`, or `so` — e.g. "It compiled, but the test failed."',
+  'Complex sentences':
+    'Attach a subordinate clause with `because`, `since`, `although`, `while`, `if`… — e.g. "We rolled back because metrics tanked."',
+  Conditionals:
+    'Zero conditional for general truths ("If you push to main, CI runs"); first for likely futures ("If it fails, we\'ll retry").',
+  'Passive voice':
+    'In passive voice the subject receives the action — e.g. "The deploy was approved by ops."',
+  'Relative clauses':
+    'Use `who/which/that` to add information about a noun — e.g. "The service that handles auth is down."',
+  'Advanced explanations and trade-offs':
+    'Explain decisions clearly: state the choice, the trade-off, and the reason — e.g. "We chose Kafka over RabbitMQ because we needed durable log replay."',
+};
+
+/** Returns a short default rule for the given topic, or '' if none is known. */
+export function defaultRuleFor(topic: string): string {
+  return DEFAULT_RULES[topic] ?? '';
+}
+
 export type GrammarPathState = 'completed' | 'current' | 'upcoming' | 'locked';
 
 export type TaggedTopic = {
