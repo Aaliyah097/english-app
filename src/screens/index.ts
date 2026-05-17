@@ -1,7 +1,6 @@
-// Screen barrel. Sibling stories (S06 onboarding, S07 practice, S10 progress,
-// S11 settings) will land their real implementations as separate modules and
-// flip these exports over. Until then, every screen is aliased to the
-// Placeholder stand-in so the App shell's routing is fully testable.
+// Screen barrel. The real OnboardingScreen ships in S06; Practice (S07),
+// Progress (S10), and Settings (S11) are still placeholders until their
+// stories land and we flip each export over to the real implementation.
 
 import { createElement } from 'react';
 import { Placeholder } from './Placeholder';
@@ -14,7 +13,7 @@ function makePlaceholder(name: string) {
   return Stub;
 }
 
-export const OnboardingScreen = makePlaceholder('Onboarding');
+export { OnboardingScreen } from './onboarding/OnboardingScreen';
 export const PracticeScreen = makePlaceholder('Practice');
 export const ProgressScreen = makePlaceholder('Progress');
 export const SettingsScreen = makePlaceholder('Settings');
