@@ -127,6 +127,7 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
     setLastResult(null);
     setUserAnswer('');
     setPhase('input');
+    tutor.reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.nativeLanguage, profile.targetLanguage]);
 
@@ -219,6 +220,10 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
     setLastResult(null);
     setUserAnswer('');
     setPhase('input');
+    // Reset the tutor hook back to 'idle' so the bootstrap useEffect (gated
+    // on tutor.status === 'idle') re-fires for the new topic. Without this,
+    // the source-sentence bubble never appears after a topic switch.
+    tutor.reset();
     setCurrentExercise({
       sourceLanguage: profile.nativeLanguage,
       targetLanguage: profile.targetLanguage,
