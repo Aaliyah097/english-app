@@ -16,6 +16,7 @@ type Props = {
 
 type Draft = {
   nativeLanguage: string;
+  targetLanguage: string;
   level: Level;
   interests: string[];
   goal: string;
@@ -23,6 +24,7 @@ type Draft = {
 
 const DEFAULT_DRAFT: Draft = {
   nativeLanguage: 'ru',
+  targetLanguage: 'en',
   level: 'intermediate',
   interests: ['Software dev', 'Architecture'],
   goal: 'Work communication',
@@ -44,7 +46,7 @@ export function OnboardingScreen({ onComplete }: Props) {
     // Final step — persist profile and seeded checkpoint.
     const profile: UserProfile = userProfileSchema.parse({
       nativeLanguage: draft.nativeLanguage,
-      targetLanguage: 'en',
+      targetLanguage: draft.targetLanguage,
       level: draft.level,
       interests: draft.interests,
       goal: draft.goal,
@@ -150,7 +152,9 @@ export function OnboardingScreen({ onComplete }: Props) {
         {step === 1 && (
           <StepLanguages
             native={draft.nativeLanguage}
-            onChange={(code) => setDraft((d) => ({ ...d, nativeLanguage: code }))}
+            target={draft.targetLanguage}
+            onChangeNative={(code) => setDraft((d) => ({ ...d, nativeLanguage: code }))}
+            onChangeTarget={(code) => setDraft((d) => ({ ...d, targetLanguage: code }))}
           />
         )}
         {step === 2 && (

@@ -3,7 +3,7 @@ import { getUserProfile, setUserProfile, subscribe } from '../../storage';
 import { theme as T } from '../../theme';
 import type { Level, UserProfile } from '../../types';
 import { Icon } from '../../ui';
-import { ALL_INTERESTS, GOALS, LEVELS, NATIVE_LANGUAGES } from '../onboarding/options';
+import { ALL_INTERESTS, GOALS, LEVELS, TARGET_LANGUAGES } from '../onboarding/options';
 
 // Re-read on every storage notification. Same pattern as PracticeScreen —
 // simpler than wrangling useSyncExternalStore + a stable selector, and
@@ -64,22 +64,22 @@ export function EditProfilePanel() {
     updateProfile({ interests: next });
   };
 
-  const setNativeLanguage = (code: string) => updateProfile({ nativeLanguage: code });
+  const setTargetLanguage = (code: string) => updateProfile({ targetLanguage: code });
   const setLevel = (level: Level) => updateProfile({ level });
   const setGoal = (goal: string) => updateProfile({ goal });
 
   return (
     <PanelCard>
       <div>
-        <SubLabel>Native language</SubLabel>
+        <SubLabel>Learning language</SubLabel>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
-          {NATIVE_LANGUAGES.map((l) => {
-            const on = profile.nativeLanguage === l.code;
+          {TARGET_LANGUAGES.map((l) => {
+            const on = profile.targetLanguage === l.code;
             return (
               <button
                 key={l.code}
                 type="button"
-                onClick={() => setNativeLanguage(l.code)}
+                onClick={() => setTargetLanguage(l.code)}
                 aria-pressed={on}
                 style={{
                   display: 'flex',

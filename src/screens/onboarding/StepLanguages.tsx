@@ -1,21 +1,15 @@
 import { theme as T } from '../../theme';
-import { Chip, Icon } from '../../ui';
+import { Icon } from '../../ui';
+import { NATIVE_LANGUAGES, TARGET_LANGUAGES } from './options';
 
 type Props = {
   native: string;
-  onChange: (code: string) => void;
+  target: string;
+  onChangeNative: (code: string) => void;
+  onChangeTarget: (code: string) => void;
 };
 
-const LANGS: ReadonlyArray<{ code: string; name: string; en: string }> = [
-  { code: 'ru', name: 'Русский', en: 'Russian' },
-  { code: 'es', name: 'Español', en: 'Spanish' },
-  { code: 'de', name: 'Deutsch', en: 'German' },
-  { code: 'fr', name: 'Français', en: 'French' },
-  { code: 'pt', name: 'Português', en: 'Portuguese' },
-  { code: 'ja', name: '日本語', en: 'Japanese' },
-];
-
-export function StepLanguages({ native, onChange }: Props) {
+export function StepLanguages({ native, target, onChangeNative, onChangeTarget }: Props) {
   return (
     <div>
       <div
@@ -32,18 +26,18 @@ export function StepLanguages({ native, onChange }: Props) {
         <br />
         native language?
       </div>
-      <div style={{ color: T.muted, fontSize: 14, marginBottom: 24 }}>
+      <div style={{ color: T.muted, fontSize: 14, marginBottom: 18 }}>
         We'll generate exercises in this language for you to translate.
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {LANGS.map((l) => {
+        {NATIVE_LANGUAGES.map((l) => {
           const on = native === l.code;
           return (
             <button
               key={l.code}
               type="button"
-              onClick={() => onChange(l.code)}
+              onClick={() => onChangeNative(l.code)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -72,32 +66,51 @@ export function StepLanguages({ native, onChange }: Props) {
 
       <div
         style={{
-          marginTop: 22,
-          padding: '14px 16px',
-          background: T.surface2,
-          borderRadius: 14,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          marginTop: 28,
+          fontFamily: T.fontDisplay,
+          fontSize: 26,
+          fontStyle: 'italic',
+          lineHeight: 1.05,
+          letterSpacing: -0.3,
+          marginBottom: 6,
         }}
       >
-        <div>
-          <div
-            style={{
-              fontSize: 11,
-              color: T.muted,
-              fontFamily: T.fontMono,
-              letterSpacing: 1,
-              textTransform: 'uppercase',
-            }}
-          >
-            Learning
-          </div>
-          <div style={{ fontSize: 15, fontWeight: 500, marginTop: 2 }}>English</div>
-        </div>
-        <Chip tone="ink" size="sm">
-          Locked for v0.1
-        </Chip>
+        And what are you
+        <br />
+        learning?
+      </div>
+      <div style={{ color: T.muted, fontSize: 14, marginBottom: 14 }}>
+        You can change this later in Settings.
+      </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {TARGET_LANGUAGES.map((l) => {
+          const on = target === l.code;
+          return (
+            <button
+              key={l.code}
+              type="button"
+              onClick={() => onChangeTarget(l.code)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                background: on ? T.ink : T.surface,
+                color: on ? T.bg : T.ink,
+                border: `0.5px solid ${on ? T.ink : T.border}`,
+                borderRadius: 999,
+                padding: '8px 14px',
+                fontFamily: T.fontBody,
+                fontSize: 13.5,
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
+            >
+              {on && <Icon.Check s={12} />}
+              {l.name}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

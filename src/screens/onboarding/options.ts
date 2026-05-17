@@ -12,6 +12,18 @@ export const NATIVE_LANGUAGES: ReadonlyArray<{ code: string; name: string; en: s
   { code: 'ja', name: '日本語', en: 'Japanese' },
 ];
 
+// Languages the user can practise. Native is the one they already speak; this
+// list is the one they're learning. Native lives on `UserProfile.nativeLanguage`,
+// this on `UserProfile.targetLanguage`.
+export const TARGET_LANGUAGES: ReadonlyArray<{ code: string; name: string; en: string }> = [
+  { code: 'en', name: 'English', en: 'English' },
+  { code: 'es', name: 'Spanish', en: 'Español' },
+  { code: 'fr', name: 'French', en: 'Français' },
+  { code: 'de', name: 'German', en: 'Deutsch' },
+  { code: 'it', name: 'Italian', en: 'Italiano' },
+  { code: 'pt', name: 'Portuguese', en: 'Português' },
+];
+
 export const ALL_INTERESTS: ReadonlyArray<string> = [
   'Software dev',
   'Architecture',
