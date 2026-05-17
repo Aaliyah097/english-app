@@ -1,34 +1,12 @@
 import { theme as T } from '../../theme';
 import type { Level } from '../../types';
 import { Icon } from '../../ui';
+import { LEVELS } from './options';
 
 type Props = {
   level: Level;
   onChange: (level: Level) => void;
 };
-
-const LEVELS: ReadonlyArray<{ id: Level; name: string; blurb: string }> = [
-  {
-    id: 'beginner',
-    name: 'Beginner',
-    blurb: 'I know basic words and some Present Simple.',
-  },
-  {
-    id: 'beginner_intermediate',
-    name: 'Beginner-Intermediate',
-    blurb: 'I can get my point across in short sentences.',
-  },
-  {
-    id: 'intermediate',
-    name: 'Intermediate',
-    blurb: 'I can hold short conversations with mistakes.',
-  },
-  {
-    id: 'upper_intermediate',
-    name: 'Upper-Intermediate',
-    blurb: 'I write at work but want to sound natural.',
-  },
-];
 
 export function StepLevel({ level, onChange }: Props) {
   return (

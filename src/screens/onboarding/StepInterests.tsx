@@ -1,29 +1,11 @@
 import { theme as T } from '../../theme';
 import { Icon } from '../../ui';
+import { ALL_INTERESTS } from './options';
 
 type Props = {
   selected: string[];
   onToggle: (interest: string) => void;
 };
-
-const ALL_INTERESTS: ReadonlyArray<string> = [
-  'Software dev',
-  'Architecture',
-  'DevOps',
-  'Data',
-  'Business',
-  'Design',
-  'Marketing',
-  'Finance',
-  'Medicine',
-  'Gaming',
-  'Travel',
-  'Music',
-  'Management',
-  'Psychology',
-  'Education',
-  'Everyday life',
-];
 
 export function StepInterests({ selected, onToggle }: Props) {
   return (
