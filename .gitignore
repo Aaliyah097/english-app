@@ -1,0 +1,9 @@
+ai
+.claude
+node_modules
+dist
+.vite
+coverage
+.DS_Store
+*.log
+*.tsbuildinfo
