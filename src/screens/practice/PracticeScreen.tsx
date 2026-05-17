@@ -245,9 +245,13 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
             aria-expanded={isPickerOpen}
             aria-label="Switch grammar topic"
             style={{
-              background: 'transparent',
-              border: 0,
-              padding: 0,
+              background: isPickerOpen ? T.surface2 : 'transparent',
+              border: `0.5px solid ${isPickerOpen ? T.border : 'transparent'}`,
+              borderRadius: 999,
+              // Negative inline margin keeps the visual baseline unchanged
+              // while giving the button a real touch target (~28px tall).
+              padding: '4px 10px',
+              margin: '-4px -10px 6px',
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
@@ -257,7 +261,6 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
               color: T.muted,
               letterSpacing: 1.2,
               textTransform: 'uppercase',
-              marginBottom: 6,
             }}
           >
             Rule · {checkpoint.currentLearningFocus.grammarTopic}
