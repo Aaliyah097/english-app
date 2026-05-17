@@ -5,14 +5,13 @@ import type { LearningCheckpoint } from '../../types';
 type Props = {
   checkpoint: LearningCheckpoint;
   onMenu?: (() => void) | undefined;
+  onTopicClick?: (() => void) | undefined;
+  isPickerOpen?: boolean;
 };
 
-// Top bar showing the current grammar topic + a cog that opens Settings.
-// No counters or progress bars — practice is intentionally endless and the
-// user stops when they feel ready. Mistake categories are still tracked in
-// the background (LearningCheckpoint.mistakesByCategory) so the AI can use
-// them to weight future exercises toward the user's weak spots.
-export function TopicBar({ checkpoint, onMenu }: Props) {
+// Top bar showing the current grammar topic (as a clickable button that
+// opens the TopicPicker overlay) + a cog that opens Settings.
+export function TopicBar({ checkpoint, onMenu, onTopicClick, isPickerOpen }: Props) {
   const topic = checkpoint.currentLearningFocus.grammarTopic;
 
   return (
@@ -25,9 +24,13 @@ export function TopicBar({ checkpoint, onMenu }: Props) {
         gap: 10,
       }}
     >
-      <div
+      <button
+        type="button"
+        onClick={onTopicClick}
+        aria-expanded={isPickerOpen ?? false}
+        aria-label="Switch grammar topic"
         style={{
-          background: T.surface,
+          background: isPickerOpen ? T.surface2 : T.surface,
           border: `0.5px solid ${T.border}`,
           borderRadius: 999,
           padding: '6px 12px',
@@ -35,11 +38,14 @@ export function TopicBar({ checkpoint, onMenu }: Props) {
           alignItems: 'center',
           gap: 8,
           color: T.ink,
+          cursor: 'pointer',
+          fontFamily: T.fontBody,
         }}
       >
         <Icon.Sparkle s={14} />
         <div style={{ fontSize: 13, fontWeight: 500 }}>{topic}</div>
-      </div>
+        <Icon.Down s={14} />
+      </button>
 
       <button
         type="button"

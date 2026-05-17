@@ -224,7 +224,34 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
         flexDirection: 'column',
       }}
     >
-      <TopicBar checkpoint={checkpoint} onMenu={onMenu} />
+      <TopicBar
+        checkpoint={checkpoint}
+        onMenu={onMenu}
+        onTopicClick={() => setIsPickerOpen((open) => !open)}
+        isPickerOpen={isPickerOpen}
+      />
+
+      {/* Topic picker overlay — drops below the TopicBar when open. */}
+      {isPickerOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 100,
+            left: 18,
+            right: 18,
+            zIndex: 40,
+            boxShadow: '0 18px 40px rgba(40,30,20,0.10), 0 6px 14px rgba(40,30,20,0.06)',
+            borderRadius: 14,
+            background: T.surface,
+          }}
+        >
+          <TopicPicker
+            currentTopic={checkpoint.currentLearningFocus.grammarTopic}
+            completedTopics={checkpoint.completedTopics}
+            onPick={handlePickTopic}
+          />
+        </div>
+      )}
 
       <div
         style={{
@@ -237,50 +264,26 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
           gap: 10,
         }}
       >
-        {/* Rule bubble — header is a button that toggles the TopicPicker */}
+        {/* Rule bubble (read-only label + rule body) */}
         <Bubble side="ai" pad="rule">
-          <button
-            type="button"
-            onClick={() => setIsPickerOpen((open) => !open)}
-            aria-expanded={isPickerOpen}
-            aria-label="Switch grammar topic"
+          <div
             style={{
-              background: isPickerOpen ? T.surface2 : 'transparent',
-              border: `0.5px solid ${isPickerOpen ? T.border : 'transparent'}`,
-              borderRadius: 999,
-              // Negative inline margin keeps the visual baseline unchanged
-              // while giving the button a real touch target (~28px tall).
-              padding: '4px 10px',
-              margin: '-4px -10px 6px',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
               fontFamily: T.fontMono,
               fontSize: 10,
               color: T.muted,
               letterSpacing: 1.2,
               textTransform: 'uppercase',
+              marginBottom: 6,
             }}
           >
             Rule · {checkpoint.currentLearningFocus.grammarTopic}
-            <span style={{ display: 'inline-flex', color: T.muted }}>
-              <Icon.Down s={12} />
-            </span>
-          </button>
+          </div>
           <div style={{ fontSize: 14, lineHeight: 1.5, color: T.ink2 }}>
             {checkpoint.currentLearningFocus.rule ||
               defaultRuleFor(checkpoint.currentLearningFocus.grammarTopic) ||
               checkpoint.lastCheckpointSummary ||
               `Let's practise ${checkpoint.currentLearningFocus.grammarTopic}.`}
           </div>
-          {isPickerOpen && (
-            <TopicPicker
-              currentTopic={checkpoint.currentLearningFocus.grammarTopic}
-              completedTopics={checkpoint.completedTopics}
-              onPick={handlePickTopic}
-            />
-          )}
         </Bubble>
 
         {/* Source prompt */}
