@@ -7,7 +7,7 @@ import {
   mergeCheckpoint,
   subscribe,
 } from '../../storage';
-import type { Exercise, LearningCheckpoint, TutorResponse, UserProfile } from '../../types';
+import type { Exercise, LearningCheckpoint, Mistake, TutorResponse, UserProfile } from '../../types';
 import { ExerciseProgress } from './ExerciseProgress';
 import { InlineDiff } from './InlineDiff';
 import { TopicBar } from './TopicBar';
@@ -296,6 +296,9 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
                 </div>
               </>
             )}
+            {lastResult.mistakes.length > 0 && (
+              <MistakeList mistakes={lastResult.mistakes} />
+            )}
             <div style={{ fontSize: 14, lineHeight: 1.5, color: T.ink2 }}>
               {lastResult.messageToUser}
             </div>
@@ -325,4 +328,62 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
       />
     </div>
   );
+}
+
+// Compact bulleted list, one entry per unique mistake `type`. Matches the
+// chat-variant mockup: small accent dot, bolded type name, then the why.
+// If the model emits two entries with the same `type` we keep the first and
+// drop the rest (per the prompt's "one bullet per unique rule" instruction —
+// this is a defence-in-depth dedupe in case the model slips).
+function MistakeList({ mistakes }: { mistakes: ReadonlyArray<Mistake> }) {
+  const unique = dedupeByType(mistakes);
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 6,
+        marginBottom: 12,
+      }}
+    >
+      {unique.map((m, i) => (
+        <div
+          key={`${m.type}-${i}`}
+          style={{
+            fontSize: 12.5,
+            color: T.ink2,
+            lineHeight: 1.45,
+            paddingLeft: 12,
+            position: 'relative',
+          }}
+        >
+          <span
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 7,
+              width: 4,
+              height: 4,
+              borderRadius: 4,
+              background: T.accent,
+            }}
+          />
+          <b style={{ color: T.ink }}>{m.type}.</b>{' '}
+          {m.explanation ?? `${m.example} → ${m.correction}`}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function dedupeByType(mistakes: ReadonlyArray<Mistake>): Mistake[] {
+  const seen = new Set<string>();
+  const out: Mistake[] = [];
+  for (const m of mistakes) {
+    const key = m.type.trim().toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(m);
+  }
+  return out;
 }

@@ -77,6 +77,10 @@ export const partialLearningCheckpointSchema = z
 export const tutorResponseSchema = z.object({
   messageToUser: z.string().min(1),
   correctedAnswer: z.string().optional(),
+  // Per-turn mistakes — what went wrong with THIS answer. Distinct from the
+  // rolling LearningCheckpoint.recentMistakes log. Rendered as a bullet list
+  // in the Practice review bubble. Empty array if the answer was perfect.
+  mistakes: z.array(mistakeSchema).default([]),
   updatedCheckpoint: partialLearningCheckpointSchema,
   nextExercise: exerciseSchema,
 });

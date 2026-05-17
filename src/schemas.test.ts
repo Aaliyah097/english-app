@@ -31,6 +31,14 @@ const validCheckpoint: LearningCheckpoint = {
 
 const validResponse: TutorResponse = {
   messageToUser: 'Nice attempt. The verb should agree with the singular subject.',
+  mistakes: [
+    {
+      type: 'Third-person singular -s',
+      example: 'the service read',
+      correction: 'the service reads',
+      explanation: 'A singular subject takes -s in Present Simple.',
+    },
+  ],
   correctedAnswer: 'This service reads messages from Kafka.',
   updatedCheckpoint: {
     currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2 },

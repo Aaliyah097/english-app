@@ -62,6 +62,7 @@ const secondExercise: Exercise = {
 function bootstrapResponse(nextExercise: Exercise = firstExercise): TutorResponse {
   return {
     messageToUser: 'Here is your first sentence.',
+    mistakes: [],
     updatedCheckpoint: {},
     nextExercise,
   };
@@ -74,6 +75,20 @@ function reviewResponse(
   return {
     messageToUser: 'Good try — fixed a couple of things.',
     correctedAnswer,
+    mistakes: [
+      {
+        type: 'Third-person singular -s',
+        example: 'service read',
+        correction: 'service reads',
+        explanation: 'Singular subject takes -s in Present Simple.',
+      },
+      {
+        type: 'Articles with technology names',
+        example: 'from the Kafka',
+        correction: 'from Kafka',
+        explanation: 'Tech product names usually take no article.',
+      },
+    ],
     updatedCheckpoint: {
       currentTopicProgress: {
         topic: 'Present Simple',
@@ -130,6 +145,10 @@ describe('PracticeScreen', () => {
     await waitFor(() =>
       expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument(),
     );
+
+    // Mistakes render as a bulleted list, one bullet per unique type.
+    expect(screen.getByText(/Third-person singular -s\./)).toBeInTheDocument();
+    expect(screen.getByText(/Articles with technology names\./)).toBeInTheDocument();
 
     // The corrected words appear via the inline diff.
     expect(screen.getByText('reads')).toBeInTheDocument();
