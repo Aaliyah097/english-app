@@ -1,38 +1,11 @@
 import { theme as T } from '../../theme';
 import { Icon } from '../../ui';
+import { GOALS } from './options';
 
 type Props = {
   goal: string;
   onChange: (label: string) => void;
 };
-
-const GOALS: ReadonlyArray<{ id: string; name: string; blurb: string }> = [
-  {
-    id: 'conversational',
-    name: 'Conversational English',
-    blurb: 'Speak more naturally in everyday situations.',
-  },
-  {
-    id: 'work',
-    name: 'Work communication',
-    blurb: 'Reviews, standups, design docs, Slack threads.',
-  },
-  {
-    id: 'interview',
-    name: 'Technical interviews',
-    blurb: 'Explain systems, trade-offs, and decisions.',
-  },
-  {
-    id: 'travel',
-    name: 'Travel English',
-    blurb: 'Airports, hotels, food, getting around.',
-  },
-  {
-    id: 'fluency',
-    name: 'General fluency',
-    blurb: 'Long-term, sustained improvement.',
-  },
-];
 
 export function StepGoal({ goal, onChange }: Props) {
   return (
