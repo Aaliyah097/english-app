@@ -145,8 +145,8 @@ const ru = {
 const en: Record<keyof typeof ru, string> = {
   'practice.rule.label': 'Rule',
   'practice.rule.fallback': "Let's practise {topic}.",
-  'practice.rule.explain': 'Объяснить',
-  'practice.rule.hide': 'Скрыть',
+  'practice.rule.explain': 'Explain',
+  'practice.rule.hide': 'Hide',
   'practice.input.placeholder': 'Type your translation…',
   'practice.input.checking': 'Checking…',
   'practice.cta.check': 'Check',
@@ -263,8 +263,8 @@ const en: Record<keyof typeof ru, string> = {
 const es: Record<keyof typeof ru, string> = {
   'practice.rule.label': 'Regla',
   'practice.rule.fallback': 'Vamos a practicar {topic}.',
-  'practice.rule.explain': 'Объяснить',
-  'practice.rule.hide': 'Скрыть',
+  'practice.rule.explain': 'Explicar',
+  'practice.rule.hide': 'Ocultar',
   'practice.input.placeholder': 'Escribe tu traducción…',
   'practice.input.checking': 'Comprobando…',
   'practice.cta.check': 'Revisar',
@@ -384,8 +384,8 @@ const es: Record<keyof typeof ru, string> = {
 const it: Record<keyof typeof ru, string> = {
   'practice.rule.label': 'Regola',
   'practice.rule.fallback': 'Pratichiamo {topic}.',
-  'practice.rule.explain': 'Объяснить',
-  'practice.rule.hide': 'Скрыть',
+  'practice.rule.explain': 'Spiega',
+  'practice.rule.hide': 'Nascondi',
   'practice.input.placeholder': 'Scrivi la tua traduzione…',
   'practice.input.checking': 'Sto controllando…',
   'practice.cta.check': 'Controlla',
