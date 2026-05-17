@@ -50,6 +50,19 @@ describe('diffWords', () => {
     ]);
   });
 
+  it('ignores trailing punctuation differences (period-only)', () => {
+    const tokens = diffWords('She often travels to Europe', 'She often travels to Europe.');
+    expect(tokens.every((t) => t.s === 'ok')).toBe(true);
+  });
+
+  it('ignores capitalisation + punctuation differences across the sentence', () => {
+    const tokens = diffWords(
+      'i prefer trains over flying',
+      'I prefer trains, over flying.',
+    );
+    expect(tokens.every((t) => t.s === 'ok')).toBe(true);
+  });
+
   it('handles mixed replacements, drops, and additions', () => {
     const tokens = diffWords(
       'This service read messages from the Kafka and stores them into database',

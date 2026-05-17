@@ -32,23 +32,32 @@ function tokenize(s: string): string[] {
   return trimmed.length === 0 ? [] : trimmed.split(/\s+/);
 }
 
+// Lowercase + strip leading/trailing punctuation so the diff treats
+// "Europe", "europe", "europe.", and "(Europe)" as the same token. The
+// AI is instructed to ignore punctuation in mistakes; this keeps the
+// client-side visual diff consistent with that promise.
+function normalize(word: string): string {
+  return word.replace(/^[\p{P}\p{S}]+|[\p{P}\p{S}]+$/gu, '').toLowerCase();
+}
+
 function tableAt(table: number[][], i: number, j: number): number {
   return table[i]?.[j] ?? 0;
 }
 
-// Build LCS table for word arrays a and b.
+// Build LCS table for word arrays — compares via normalized keys so
+// punctuation/casing differences don't break matches.
 function lcsTable(a: string[], b: string[]): number[][] {
   const n = a.length;
   const m = b.length;
+  const aKeys = a.map(normalize);
+  const bKeys = b.map(normalize);
   const table: number[][] = Array.from({ length: n + 1 }, () =>
     new Array<number>(m + 1).fill(0),
   );
   for (let i = 1; i <= n; i++) {
     for (let j = 1; j <= m; j++) {
-      const ai = a[i - 1]!;
-      const bj = b[j - 1]!;
       const row = table[i]!;
-      if (ai === bj) {
+      if (aKeys[i - 1] === bKeys[j - 1]) {
         row[j] = tableAt(table, i - 1, j - 1) + 1;
       } else {
         row[j] = Math.max(tableAt(table, i - 1, j), tableAt(table, i, j - 1));
@@ -64,21 +73,23 @@ type Op =
   | { kind: 'add'; word: string };
 
 function walk(a: string[], b: string[], table: number[][]): Op[] {
+  const aKeys = a.map(normalize);
+  const bKeys = b.map(normalize);
   const ops: Op[] = [];
   let i = a.length;
   let j = b.length;
   while (i > 0 || j > 0) {
-    const ai = i > 0 ? a[i - 1] : undefined;
-    const bj = j > 0 ? b[j - 1] : undefined;
-    if (i > 0 && j > 0 && ai === bj) {
-      ops.push({ kind: 'ok', word: ai! });
+    if (i > 0 && j > 0 && aKeys[i - 1] === bKeys[j - 1]) {
+      // Prefer the corrected-side display so punctuation matches the
+      // AI's clean output even though we matched via the normalized key.
+      ops.push({ kind: 'ok', word: b[j - 1]! });
       i--;
       j--;
     } else if (j > 0 && (i === 0 || tableAt(table, i, j - 1) >= tableAt(table, i - 1, j))) {
-      ops.push({ kind: 'add', word: bj! });
+      ops.push({ kind: 'add', word: b[j - 1]! });
       j--;
     } else {
-      ops.push({ kind: 'drop', word: ai! });
+      ops.push({ kind: 'drop', word: a[i - 1]! });
       i--;
     }
   }
