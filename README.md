@@ -10,12 +10,11 @@ See **[`docs/PLAN.md`](docs/PLAN.md)** for the development plan and **[`docs/sto
 nvm use            # Node 20 (see .nvmrc)
 npm install
 
-# Local dev with the serverless function:
-#   1. Install Vercel CLI once:  npm i -g vercel
-#   2. Create .env.local with:   DEEPSEEK_API_KEY=sk-...
-#   3. Run the full stack:       vercel dev   # http://localhost:3000
+# Create .env.local in the project root:
+#   DEEPSEEK_API_KEY=sk-...
+# (Optional: DEEPSEEK_MODEL=deepseek-chat)
 
-# Frontend-only (no /api/tutor — Practice will show network errors):
+# Full stack — Vite dev server + /api/tutor handler in-process:
 npm run dev        # http://localhost:5173
 
 # Verifications:
@@ -24,6 +23,8 @@ npm run lint
 npm run test
 npm run build && npm run preview
 ```
+
+`npm run dev` mounts the same `api/tutor.ts` handler used in production via a small dev-only Vite plugin (see [`src/dev/apiPlugin.ts`](src/dev/apiPlugin.ts)). No `vercel dev`, no separate Node server — one command for the whole stack.
 
 ## Deploying to Vercel
 
