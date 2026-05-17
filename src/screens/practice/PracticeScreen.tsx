@@ -293,15 +293,11 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
               Translate to {profile.targetLanguage.toUpperCase()}:
             </div>
             <div
-              // Matches the rule bubble's body typography for visual
-              // consistency. Same body sans, same size, same line-height —
-              // the only differences are weight (medium, so the prompt stands
-              // out as actionable text) and color (ink instead of ink2, since
-              // this is the focus of the bubble).
+              // Same typography as the rule body — regular weight + ink (not
+              // ink2) so it reads as the prompt without standing out as bold.
               style={{
                 fontFamily: T.fontBody,
                 fontSize: 14,
-                fontWeight: 500,
                 lineHeight: 1.5,
                 color: T.ink,
               }}

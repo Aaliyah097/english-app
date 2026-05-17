@@ -66,6 +66,8 @@ export function TopicPicker({ currentTopic, completedTopics, onPick }: Props) {
   );
 }
 
+// Only the two "actionable" states get a label. Upcoming rows are clickable
+// but unadorned; locked rows are visually muted via the row's own opacity.
 function StatePill({ state }: { state: GrammarPathState }) {
   if (state === 'current') {
     return <Tag color={T.accent} bg={T.accentSoft} label="Current" />;
@@ -77,10 +79,7 @@ function StatePill({ state }: { state: GrammarPathState }) {
       </Tag>
     );
   }
-  if (state === 'locked') {
-    return <Tag color={T.muted} bg={T.surface} label="Locked" border={T.border} />;
-  }
-  return <Tag color={T.muted} bg={T.surface} label="Upcoming" border={T.border} />;
+  return null;
 }
 
 function Tag({
