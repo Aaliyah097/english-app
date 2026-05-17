@@ -13,7 +13,16 @@
 import { loadEnv, type Plugin } from 'vite';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
-const HANDLED_PATH = '/api/tutor';
+// Resolves /api/<name>(?...|/...) → the handler module path. Returns null if
+// the URL doesn't look like an /api/ request.
+function resolveHandlerPath(reqUrl: string): string | null {
+  if (!reqUrl.startsWith('/api/')) return null;
+  // Strip query string and trailing path segments — only the endpoint name
+  // matters (`/api/tutor`, `/api/explain`, etc.).
+  const name = reqUrl.slice('/api/'.length).split(/[/?]/)[0];
+  if (!name) return null;
+  return `/api/${name}`;
+}
 
 export function apiDevPlugin(): Plugin {
   return {
@@ -21,19 +30,21 @@ export function apiDevPlugin(): Plugin {
     apply: 'serve',
     configureServer(server) {
       // Mirror Vercel's behaviour: read .env / .env.local into process.env
-      // so the handler can `process.env.DEEPSEEK_API_KEY` exactly as in prod.
+      // so handlers can `process.env.DEEPSEEK_API_KEY` exactly as in prod.
       const env = loadEnv('development', process.cwd(), '');
       for (const [k, v] of Object.entries(env)) {
         if (process.env[k] == null) process.env[k] = v;
       }
 
       server.middlewares.use(async (req, res, next) => {
-        if (!req.url || !req.url.startsWith(HANDLED_PATH)) return next();
+        if (!req.url) return next();
+        const handlerPath = resolveHandlerPath(req.url);
+        if (!handlerPath) return next();
         try {
           const webReq = await toWebRequest(req);
-          // Dynamic import so the handler module is reloaded each request —
-          // edits to api/tutor.ts take effect without restarting the server.
-          const mod = await server.ssrLoadModule('/api/tutor');
+          // Dynamic import so each request re-evaluates the handler — edits
+          // to api/*.ts take effect without restarting the dev server.
+          const mod = await server.ssrLoadModule(handlerPath);
           const handler = mod.default as (r: Request) => Promise<Response>;
           const webRes = await handler(webReq);
           await writeWebResponse(webRes, res);

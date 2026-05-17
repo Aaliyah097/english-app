@@ -14,7 +14,11 @@ import { TopicBar } from './TopicBar';
 import { TopicPicker } from './TopicPicker';
 import { diffWords } from './diff';
 import { useTutorTurn } from './useTutorTurn';
-import { defaultRuleKeyFor, topicLabelKeyFor } from '../progress/grammarPath';
+import {
+  defaultRuleKeyFor,
+  explanationFor,
+  topicLabelKeyFor,
+} from '../progress/grammarPath';
 import { t } from '../../i18n';
 import { useLocale } from '../../i18n/useLocale';
 
@@ -107,6 +111,7 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
   const [lastResult, setLastResult] = useState<TutorResponse | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isExplainOpen, setIsExplainOpen] = useState(false);
   const [errorKind, setErrorKind] = useState<
     'network-error' | 'invalid-response' | null
   >(null);
@@ -296,7 +301,7 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
           gap: 10,
         }}
       >
-        {/* Rule bubble (read-only label + rule body) */}
+        {/* Rule bubble (read-only label + rule body + Explain button) */}
         <Bubble side="ai" pad="rule">
           <div
             style={{
@@ -328,6 +333,53 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
                 return t(locale, 'practice.rule.fallback', { topic: topicLabel });
               })()}
           </div>
+
+          {(() => {
+            const explanation = explanationFor(
+              checkpoint.currentLearningFocus.grammarTopic,
+            );
+            if (!explanation) return null;
+            return (
+              <div style={{ marginTop: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => setIsExplainOpen((open) => !open)}
+                  aria-expanded={isExplainOpen}
+                  style={{
+                    background: isExplainOpen ? T.surface2 : 'transparent',
+                    border: `0.5px solid ${T.border}`,
+                    borderRadius: 999,
+                    padding: '4px 10px',
+                    cursor: 'pointer',
+                    color: T.ink2,
+                    fontFamily: T.fontBody,
+                    fontSize: 12,
+                    fontWeight: 500,
+                  }}
+                >
+                  {isExplainOpen
+                    ? t(locale, 'practice.rule.hide')
+                    : t(locale, 'practice.rule.explain')}
+                </button>
+                {isExplainOpen && (
+                  <div
+                    style={{
+                      marginTop: 10,
+                      padding: 12,
+                      background: T.surface2,
+                      borderRadius: 12,
+                      fontSize: 13.5,
+                      lineHeight: 1.55,
+                      color: T.ink,
+                      whiteSpace: 'pre-wrap',
+                    }}
+                  >
+                    {explanation}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </Bubble>
 
         {/* Source prompt — always in the user's native language (Russian). */}
