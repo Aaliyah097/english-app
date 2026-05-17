@@ -3,26 +3,33 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { learningCheckpointSchema, userProfileSchema } from '../../schemas';
 import { getCheckpoint, getUserProfile } from '../../storage';
+import { t } from '../../i18n';
 import { OnboardingScreen } from './OnboardingScreen';
+
+// Onboarding runs before the profile exists, so the UI is in Russian — the
+// app's default locale. We pull the expected labels through t() so the tests
+// keep working if Russian copy is later refined.
+const RU = (key: Parameters<typeof t>[1]) => t('ru', key);
 
 describe('OnboardingScreen', () => {
   beforeEach(() => {
     localStorage.clear();
   });
 
-  it('renders the welcome step on mount', () => {
+  it('renders the welcome step on mount (in Russian)', () => {
     render(<OnboardingScreen />);
-    expect(screen.getByText(/Learn English/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Begin' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: RU('onboarding.button.begin') }),
+    ).toBeInTheDocument();
   });
 
   it('advances to the languages step when "Begin" is clicked', async () => {
     const user = userEvent.setup();
     render(<OnboardingScreen />);
-    await user.click(screen.getByRole('button', { name: 'Begin' }));
-    expect(screen.getByText(/native language/i)).toBeInTheDocument();
-    // Default selection: Russian
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: RU('onboarding.button.begin') }));
+    expect(
+      screen.getByRole('button', { name: RU('onboarding.button.continue') }),
+    ).toBeInTheDocument();
   });
 
   it('walks through all five steps and persists a valid profile + checkpoint', async () => {
@@ -30,20 +37,13 @@ describe('OnboardingScreen', () => {
     const onComplete = vi.fn();
     render(<OnboardingScreen onComplete={onComplete} />);
 
-    // Step 1: Welcome → Begin
-    await user.click(screen.getByRole('button', { name: 'Begin' }));
-
-    // Step 2: Languages (default ru) → Continue
-    await user.click(screen.getByRole('button', { name: 'Continue' }));
-
-    // Step 3: Level (default intermediate) → Continue
-    await user.click(screen.getByRole('button', { name: 'Continue' }));
-
-    // Step 4: Interests (defaults pre-selected) → Continue
-    await user.click(screen.getByRole('button', { name: 'Continue' }));
-
-    // Step 5: Goal (default 'Work communication') → Start practising
-    await user.click(screen.getByRole('button', { name: 'Start practising' }));
+    await user.click(screen.getByRole('button', { name: RU('onboarding.button.begin') }));
+    await user.click(screen.getByRole('button', { name: RU('onboarding.button.continue') }));
+    await user.click(screen.getByRole('button', { name: RU('onboarding.button.continue') }));
+    await user.click(screen.getByRole('button', { name: RU('onboarding.button.continue') }));
+    await user.click(
+      screen.getByRole('button', { name: RU('onboarding.button.startPractising') }),
+    );
 
     expect(onComplete).toHaveBeenCalledOnce();
 
@@ -56,9 +56,10 @@ describe('OnboardingScreen', () => {
     expect(() => learningCheckpointSchema.parse(checkpoint)).not.toThrow();
 
     // Sanity checks on contents
+    expect(profile?.nativeLanguage).toBe('ru');
     expect(profile?.targetLanguage).toBe('en');
     expect(profile?.preferredPracticeMode).toBe('translation');
-    expect(profile?.goal).toBe('Work communication');
+    expect(profile?.goal).toBe('work');
     expect(checkpoint?.currentLearningFocus.grammarTopic).toBe('Present Simple');
   });
 });

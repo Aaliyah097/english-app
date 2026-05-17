@@ -1,5 +1,7 @@
 import { theme as T } from '../../theme';
 import { Icon } from '../../ui';
+import { t } from '../../i18n';
+import { useLocale } from '../../i18n/useLocale';
 import { ALL_INTERESTS } from './options';
 
 type Props = {
@@ -8,6 +10,7 @@ type Props = {
 };
 
 export function StepInterests({ selected, onToggle }: Props) {
+  const locale = useLocale();
   return (
     <div>
       <div
@@ -20,23 +23,27 @@ export function StepInterests({ selected, onToggle }: Props) {
           marginBottom: 8,
         }}
       >
-        Pick a few worlds
-        <br />
-        you know well.
+        {t(locale, 'onboarding.interests.title')
+          .split('\n')
+          .map((line, i, arr) => (
+            <span key={i}>
+              {line}
+              {i < arr.length - 1 && <br />}
+            </span>
+          ))}
       </div>
       <div style={{ color: T.muted, fontSize: 14, marginBottom: 22 }}>
-        We'll draw sentences from these.{' '}
-        <span style={{ color: T.ink2 }}>{selected.length} selected</span>.
+        {t(locale, 'onboarding.interests.subtitle', { count: selected.length })}
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        {ALL_INTERESTS.map((t) => {
-          const on = selected.includes(t);
+        {ALL_INTERESTS.map(({ id, labelKey }) => {
+          const on = selected.includes(id);
           return (
             <button
-              key={t}
+              key={id}
               type="button"
-              onClick={() => onToggle(t)}
+              onClick={() => onToggle(id)}
               style={{
                 border: `0.5px solid ${on ? T.ink : T.border}`,
                 background: on ? T.ink : T.surface,
@@ -53,30 +60,10 @@ export function StepInterests({ selected, onToggle }: Props) {
               }}
             >
               {on && <Icon.Check s={12} />}
-              {t}
+              {t(locale, labelKey)}
             </button>
           );
         })}
-      </div>
-
-      <div
-        style={{
-          marginTop: 28,
-          background: T.surface2,
-          border: `0.5px dashed ${T.borderStrong}`,
-          borderRadius: 14,
-          padding: 14,
-          display: 'flex',
-          gap: 10,
-        }}
-      >
-        <div style={{ color: T.accent, marginTop: 2 }}>
-          <Icon.Sparkle s={18} />
-        </div>
-        <div style={{ fontSize: 12.5, color: T.ink2, lineHeight: 1.45 }}>
-          With <b>Software dev</b> selected, your first exercises will involve services,
-          APIs, databases, Kafka, deployments, and code review.
-        </div>
       </div>
     </div>
   );

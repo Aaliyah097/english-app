@@ -1,6 +1,9 @@
 import { theme as T } from '../../theme';
+import { t } from '../../i18n';
+import { useLocale } from '../../i18n/useLocale';
 
 export function StepWelcome() {
+  const locale = useLocale();
   return (
     <div style={{ padding: '40px 4px 0' }}>
       {/* small wordmark */}
@@ -40,22 +43,24 @@ export function StepWelcome() {
       <div
         style={{
           fontFamily: T.fontDisplay,
-          fontSize: 42,
-          lineHeight: 1.02,
-          letterSpacing: -0.8,
+          fontSize: 38,
+          lineHeight: 1.1,
+          letterSpacing: -0.6,
           marginBottom: 18,
         }}
       >
-        Learn English
-        <br />
-        through the things
-        <br />
-        <em style={{ color: T.accent }}>you already know.</em>
+        {t(locale, 'onboarding.welcome.headline')
+          .split('\n')
+          .map((line, i, arr) => (
+            <span key={i}>
+              {line}
+              {i < arr.length - 1 && <br />}
+            </span>
+          ))}
       </div>
 
       <div style={{ fontSize: 15.5, color: T.ink2, lineHeight: 1.5, marginBottom: 36 }}>
-        Practice grammar by translating real sentences from your work — backend, design,
-        business, anything. We correct, explain, and save the useful phrases for later.
+        {t(locale, 'onboarding.welcome.body')}
       </div>
 
       <div
@@ -77,17 +82,15 @@ export function StepWelcome() {
             marginBottom: 10,
           }}
         >
-          Sample exercise
+          {t(locale, 'onboarding.welcome.sampleLabel')}
         </div>
         <div style={{ color: T.ink2, fontSize: 14, marginBottom: 8, lineHeight: 1.4 }}>
-          Этот сервис читает сообщения из Kafka и сохраняет их в базе данных.
+          Она пьёт кофе каждое утро.
         </div>
         <div style={{ height: 0.5, background: T.border, margin: '12px -18px' }} />
         <div style={{ color: T.ink, fontSize: 14, lineHeight: 1.4 }}>
-          This service{' '}
-          <span style={{ color: T.accent, fontWeight: 500 }}>reads</span> messages from Kafka
-          and <span style={{ color: T.accent, fontWeight: 500 }}>stores</span> them in the
-          database.
+          She <span style={{ color: T.accent, fontWeight: 500 }}>drinks</span> coffee every
+          morning.
         </div>
       </div>
     </div>

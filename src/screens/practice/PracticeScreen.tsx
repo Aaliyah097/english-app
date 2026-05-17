@@ -14,7 +14,9 @@ import { TopicBar } from './TopicBar';
 import { TopicPicker } from './TopicPicker';
 import { diffWords } from './diff';
 import { useTutorTurn } from './useTutorTurn';
-import { defaultRuleFor } from '../progress/grammarPath';
+import { defaultRuleKeyFor, topicLabelKeyFor } from '../progress/grammarPath';
+import { t } from '../../i18n';
+import { useLocale } from '../../i18n/useLocale';
 
 type Props = {
   onMenu?: (() => void) | undefined;
@@ -56,6 +58,7 @@ export function PracticeScreen({ onMenu }: Props) {
 }
 
 function PracticeMissingState() {
+  const locale = useLocale();
   return (
     <div
       style={{
@@ -72,10 +75,10 @@ function PracticeMissingState() {
     >
       <div>
         <div style={{ fontFamily: T.fontDisplay, fontSize: 22, marginBottom: 6 }}>
-          Practice unavailable
+          {t(locale, 'practice.missing.title')}
         </div>
         <div style={{ color: T.muted, fontSize: 13 }}>
-          Finish onboarding to start practising.
+          {t(locale, 'practice.missing.body')}
         </div>
       </div>
     </div>
@@ -193,14 +196,19 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
     void runTurn(userAnswer);
   }
 
+  const locale = useLocale();
+
   function handlePickTopic(topic: string) {
     setIsPickerOpen(false);
     if (topic === checkpoint.currentLearningFocus.grammarTopic) return;
+    const ruleKey = defaultRuleKeyFor(topic);
     mergeCheckpoint({
       currentLearningFocus: {
         grammarTopic: topic,
         difficulty: 1,
-        rule: defaultRuleFor(topic),
+        // Clear the rule — the AI will fill in a target-language rule on
+        // the next turn. The defaults in i18n are the fallback while we wait.
+        rule: ruleKey ? t(locale, ruleKey) : '',
       },
       currentTopicProgress: {
         topic,
@@ -208,7 +216,6 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
         knownWeaknesses: [],
       },
     });
-    // Reset the in-screen state so the bootstrap fires for the new topic.
     setLastResult(null);
     setUserAnswer('');
     setPhase('input');
@@ -221,7 +228,10 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
     });
   }
 
-  const placeholder = phase === 'awaiting' ? 'Checking…' : 'Type your translation…';
+  const placeholder =
+    phase === 'awaiting'
+      ? t(locale, 'practice.input.checking')
+      : t(locale, 'practice.input.placeholder');
 
   const diffTokens = useMemo(() => {
     if (!lastResult?.correctedAnswer) return null;
@@ -293,21 +303,33 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
               marginBottom: 6,
             }}
           >
-            Rule · {checkpoint.currentLearningFocus.grammarTopic}
+            {t(locale, 'practice.rule.label')} ·{' '}
+            {(() => {
+              const topicKey = topicLabelKeyFor(checkpoint.currentLearningFocus.grammarTopic);
+              return topicKey
+                ? t(locale, topicKey)
+                : checkpoint.currentLearningFocus.grammarTopic;
+            })()}
           </div>
           <div style={{ fontSize: 14, lineHeight: 1.5, color: T.ink2 }}>
             {checkpoint.currentLearningFocus.rule ||
-              defaultRuleFor(checkpoint.currentLearningFocus.grammarTopic) ||
-              checkpoint.lastCheckpointSummary ||
-              `Let's practise ${checkpoint.currentLearningFocus.grammarTopic}.`}
+              (() => {
+                const ruleKey = defaultRuleKeyFor(checkpoint.currentLearningFocus.grammarTopic);
+                if (ruleKey) return t(locale, ruleKey);
+                const topicKey = topicLabelKeyFor(checkpoint.currentLearningFocus.grammarTopic);
+                const topicLabel = topicKey
+                  ? t(locale, topicKey)
+                  : checkpoint.currentLearningFocus.grammarTopic;
+                return t(locale, 'practice.rule.fallback', { topic: topicLabel });
+              })()}
           </div>
         </Bubble>
 
-        {/* Source prompt */}
+        {/* Source prompt — always in the user's native language (Russian). */}
         {currentExercise.sentence !== '' && (
           <Bubble side="ai">
             <div style={{ fontSize: 13, color: T.muted, marginBottom: 6 }}>
-              Translate to {profile.targetLanguage.toUpperCase()}:
+              {profile.targetLanguage.toUpperCase()} →
             </div>
             <div
               // Same typography as the rule body — regular weight + ink (not
@@ -341,7 +363,7 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
               <Chip tone="good" size="sm">
                 <Icon.Check s={11} />
-                Reviewed
+                {t(locale, 'practice.review.reviewed')}
               </Chip>
             </div>
             {lastResult.correctedAnswer && diffTokens && (
@@ -356,7 +378,7 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
                     marginBottom: 6,
                   }}
                 >
-                  Corrected
+                  {t(locale, 'practice.review.corrected')}
                 </div>
                 <div
                   style={{
@@ -383,24 +405,24 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
         {phase === 'error' && errorKind != null && (
           <Bubble side="ai">
             <div style={{ fontSize: 14, lineHeight: 1.5, marginBottom: 10, color: T.accentInk }}>
-              {lastError ?? 'Something went wrong.'}
+              {lastError ?? t(locale, 'practice.error.fallback')}
             </div>
             <Btn kind="primary" size="sm" onClick={handleRetry}>
-              Retry
+              {t(locale, 'practice.cta.retry')}
             </Btn>
           </Bubble>
         )}
       </div>
 
       {phase === 'review' ? (
-        <NextDock onNext={handleNext} />
+        <NextDock onNext={handleNext} label={t(locale, 'practice.cta.next')} />
       ) : (
         <InputDock
           value={userAnswer}
           onChange={setUserAnswer}
           onSubmit={handleSubmit}
           placeholder={placeholder}
-          cta="Check"
+          cta={t(locale, 'practice.cta.check')}
           disabled={phase === 'awaiting'}
         />
       )}
@@ -411,7 +433,7 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
 // Replaces the InputDock in the review phase: a single full-width "Next
 // exercise" CTA at the same vertical position. Avoids showing a dead input
 // field when the AI has already corrected the user's answer.
-function NextDock({ onNext }: { onNext: () => void }) {
+function NextDock({ onNext, label }: { onNext: () => void; label: string }) {
   return (
     <div
       style={{
@@ -425,7 +447,7 @@ function NextDock({ onNext }: { onNext: () => void }) {
       }}
     >
       <Btn kind="accent" size="lg" full icon={<Icon.Arrow s={16} />} onClick={onNext}>
-        Next exercise
+        {label}
       </Btn>
     </div>
   );

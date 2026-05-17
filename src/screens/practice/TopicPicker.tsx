@@ -4,7 +4,14 @@
 
 import { theme as T } from '../../theme';
 import { Icon } from '../../ui';
-import { GRAMMAR_PATH, tagGrammarPath, type GrammarPathState } from '../progress/grammarPath';
+import { t } from '../../i18n';
+import { useLocale } from '../../i18n/useLocale';
+import {
+  GRAMMAR_PATH,
+  tagGrammarPath,
+  topicLabelKeyFor,
+  type GrammarPathState,
+} from '../progress/grammarPath';
 
 type Props = {
   currentTopic: string;
@@ -14,6 +21,7 @@ type Props = {
 
 export function TopicPicker({ currentTopic, completedTopics, onPick }: Props) {
   const tagged = tagGrammarPath(completedTopics, currentTopic);
+  const locale = useLocale();
 
   return (
     <div
@@ -33,6 +41,8 @@ export function TopicPicker({ currentTopic, completedTopics, onPick }: Props) {
       {tagged.map(({ name, state }) => {
         const disabled = state === 'locked';
         const isCurrent = state === 'current';
+        const labelKey = topicLabelKeyFor(name);
+        const display = labelKey ? t(locale, labelKey) : name;
         return (
           <button
             key={name}
@@ -57,8 +67,12 @@ export function TopicPicker({ currentTopic, completedTopics, onPick }: Props) {
               fontWeight: isCurrent ? 500 : 400,
             }}
           >
-            <span>{name}</span>
-            <StatePill state={state} />
+            <span>{display}</span>
+            <StatePill
+              state={state}
+              currentLabel={t(locale, 'picker.state.current')}
+              doneLabel={t(locale, 'picker.state.done')}
+            />
           </button>
         );
       })}
@@ -68,13 +82,21 @@ export function TopicPicker({ currentTopic, completedTopics, onPick }: Props) {
 
 // Only the two "actionable" states get a label. Upcoming rows are clickable
 // but unadorned; locked rows are visually muted via the row's own opacity.
-function StatePill({ state }: { state: GrammarPathState }) {
+function StatePill({
+  state,
+  currentLabel,
+  doneLabel,
+}: {
+  state: GrammarPathState;
+  currentLabel: string;
+  doneLabel: string;
+}) {
   if (state === 'current') {
-    return <Tag color={T.accent} bg={T.accentSoft} label="Current" />;
+    return <Tag color={T.accent} bg={T.accentSoft} label={currentLabel} />;
   }
   if (state === 'completed') {
     return (
-      <Tag color={T.good} bg={T.goodSoft} label="Done">
+      <Tag color={T.good} bg={T.goodSoft} label={doneLabel}>
         <Icon.Check s={10} />
       </Tag>
     );

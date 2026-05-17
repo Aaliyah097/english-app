@@ -1,6 +1,8 @@
 // Canonical 13-item grammar path from ai/claude_code_mvp_brief.md "Learning Path".
-// This list is the source of truth for the Progress screen and any future
-// settings UI that lets the learner jump topics.
+// The IDs are English (the canonical stored value); user-facing labels and
+// rule fallbacks are localised via i18n.
+
+import type { StringKey } from '../../i18n/strings';
 
 export const GRAMMAR_PATH = [
   'Present Simple',
@@ -20,44 +22,47 @@ export const GRAMMAR_PATH = [
 
 export type GrammarTopic = (typeof GRAMMAR_PATH)[number];
 
-// Short fallback rule for each canonical topic. Used when the checkpoint's
-// currentLearningFocus.rule is empty — either an old stored checkpoint or a
-// turn where the AI didn't include the rule field. Examples are intentionally
-// everyday-life scenes so the rule reads naturally regardless of the user's
-// declared interests; the AI is encouraged to override with something more
-// tailored on the next turn.
-const DEFAULT_RULES: Record<string, string> = {
-  'Present Simple':
-    'Use Present Simple for facts, habits, and routines — e.g. "She drinks coffee every morning."',
-  'Present Continuous':
-    'Use Present Continuous for actions happening right now or around now — e.g. "I\'m reading a book."',
-  'Past Simple':
-    'Use Past Simple for finished actions at a specific past time — e.g. "We visited Paris last summer."',
-  'Future Simple':
-    "Use `will` for spontaneous decisions and predictions, `be going to` for plans — e.g. \"I'll call you later.\" / \"We're going to move next year.\"",
-  'Present Perfect':
-    'Use Present Perfect for past actions still connected to now — e.g. "I\'ve already eaten."',
-  'Present Perfect vs Past Simple':
-    'Past Simple for a finished moment ("I saw her yesterday"); Present Perfect for unfinished time or recent relevance ("I\'ve seen that film").',
-  'Past Continuous':
-    'Use Past Continuous for an action in progress in the past, often interrupted — e.g. "I was cooking when the phone rang."',
-  'Compound sentences':
-    'Join two independent clauses with `and`, `but`, `or`, or `so` — e.g. "It was raining, but we went for a walk anyway."',
-  'Complex sentences':
-    'Attach a subordinate clause with `because`, `since`, `although`, `while`, `if`… — e.g. "I stayed home because I was tired."',
-  Conditionals:
-    'Zero conditional for general truths ("If you heat water, it boils"); first for likely futures ("If it rains, we\'ll stay in").',
-  'Passive voice':
-    'In passive voice the subject receives the action — e.g. "The cake was eaten by the kids."',
-  'Relative clauses':
-    'Use `who/which/that` to add information about a noun — e.g. "The book that I\'m reading is great."',
-  'Advanced explanations and trade-offs':
-    'Explain decisions clearly: state the choice, the trade-off, and the reason — e.g. "I prefer trains over flying because they\'re more comfortable, even if slower."',
+// Maps each canonical topic ID to its i18n keys for the display label and the
+// default rule explanation. Adding a topic requires extending both maps and
+// the strings file.
+const TOPIC_LABEL_KEYS: Record<string, StringKey> = {
+  'Present Simple': 'topic.presentSimple',
+  'Present Continuous': 'topic.presentContinuous',
+  'Past Simple': 'topic.pastSimple',
+  'Future Simple': 'topic.futureSimple',
+  'Present Perfect': 'topic.presentPerfect',
+  'Present Perfect vs Past Simple': 'topic.presentPerfectVsPastSimple',
+  'Past Continuous': 'topic.pastContinuous',
+  'Compound sentences': 'topic.compoundSentences',
+  'Complex sentences': 'topic.complexSentences',
+  Conditionals: 'topic.conditionals',
+  'Passive voice': 'topic.passiveVoice',
+  'Relative clauses': 'topic.relativeClauses',
+  'Advanced explanations and trade-offs': 'topic.advanced',
 };
 
-/** Returns a short default rule for the given topic, or '' if none is known. */
-export function defaultRuleFor(topic: string): string {
-  return DEFAULT_RULES[topic] ?? '';
+const RULE_KEYS: Record<string, StringKey> = {
+  'Present Simple': 'rule.presentSimple',
+  'Present Continuous': 'rule.presentContinuous',
+  'Past Simple': 'rule.pastSimple',
+  'Future Simple': 'rule.futureSimple',
+  'Present Perfect': 'rule.presentPerfect',
+  'Present Perfect vs Past Simple': 'rule.presentPerfectVsPastSimple',
+  'Past Continuous': 'rule.pastContinuous',
+  'Compound sentences': 'rule.compoundSentences',
+  'Complex sentences': 'rule.complexSentences',
+  Conditionals: 'rule.conditionals',
+  'Passive voice': 'rule.passiveVoice',
+  'Relative clauses': 'rule.relativeClauses',
+  'Advanced explanations and trade-offs': 'rule.advanced',
+};
+
+export function topicLabelKeyFor(topic: string): StringKey | null {
+  return TOPIC_LABEL_KEYS[topic] ?? null;
+}
+
+export function defaultRuleKeyFor(topic: string): StringKey | null {
+  return RULE_KEYS[topic] ?? null;
 }
 
 export type GrammarPathState = 'completed' | 'current' | 'upcoming' | 'locked';

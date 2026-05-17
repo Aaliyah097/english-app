@@ -1,95 +1,68 @@
 // Shared option lists for the onboarding steps. Settings (S11) reuses these so
 // the two surfaces never drift. Keep behaviour identical to S06.
 
+import type { StringKey } from '../../i18n/strings';
 import type { Level } from '../../types';
 
-export const NATIVE_LANGUAGES: ReadonlyArray<{ code: string; name: string; en: string }> = [
-  { code: 'ru', name: 'Русский', en: 'Russian' },
-  { code: 'es', name: 'Español', en: 'Spanish' },
-  { code: 'de', name: 'Deutsch', en: 'German' },
-  { code: 'fr', name: 'Français', en: 'French' },
-  { code: 'pt', name: 'Português', en: 'Portuguese' },
-  { code: 'ja', name: '日本語', en: 'Japanese' },
-];
+// v1 assumes all users are native Russian speakers — no native-language picker.
+// The native code is hardcoded as 'ru' wherever we need it.
+export const NATIVE_LANGUAGE_CODE = 'ru' as const;
 
-// Languages the user can practise. Native is the one they already speak; this
-// list is the one they're learning. Native lives on `UserProfile.nativeLanguage`,
-// this on `UserProfile.targetLanguage`.
+// Languages the user can practise. Restricted to the three locales we ship
+// full UI translations for. Each entry's `name` is shown in the picker (it's
+// the language's native name, so a Russian user picking targets sees them in
+// each target language's own glyphs).
 export const TARGET_LANGUAGES: ReadonlyArray<{ code: string; name: string; en: string }> = [
   { code: 'en', name: 'English', en: 'English' },
-  { code: 'es', name: 'Spanish', en: 'Español' },
-  { code: 'fr', name: 'French', en: 'Français' },
-  { code: 'de', name: 'German', en: 'Deutsch' },
-  { code: 'it', name: 'Italian', en: 'Italiano' },
-  { code: 'pt', name: 'Portuguese', en: 'Português' },
+  { code: 'es', name: 'Español', en: 'Spanish' },
+  { code: 'it', name: 'Italiano', en: 'Italian' },
 ];
 
-export const ALL_INTERESTS: ReadonlyArray<string> = [
-  'Software dev',
-  'Architecture',
-  'DevOps',
-  'Data',
-  'Business',
-  'Design',
-  'Marketing',
-  'Finance',
-  'Medicine',
-  'Gaming',
-  'Travel',
-  'Music',
-  'Management',
-  'Psychology',
-  'Education',
-  'Everyday life',
+// Interest IDs are stored canonical (English label) on the profile and sent
+// to the AI as-is. The displayed label is resolved via i18n at render time.
+export const ALL_INTERESTS: ReadonlyArray<{ id: string; labelKey: StringKey }> = [
+  { id: 'Software dev', labelKey: 'interest.softwareDev' },
+  { id: 'Architecture', labelKey: 'interest.architecture' },
+  { id: 'DevOps', labelKey: 'interest.devops' },
+  { id: 'Data', labelKey: 'interest.data' },
+  { id: 'Business', labelKey: 'interest.business' },
+  { id: 'Design', labelKey: 'interest.design' },
+  { id: 'Marketing', labelKey: 'interest.marketing' },
+  { id: 'Finance', labelKey: 'interest.finance' },
+  { id: 'Medicine', labelKey: 'interest.medicine' },
+  { id: 'Gaming', labelKey: 'interest.gaming' },
+  { id: 'Travel', labelKey: 'interest.travel' },
+  { id: 'Music', labelKey: 'interest.music' },
+  { id: 'Management', labelKey: 'interest.management' },
+  { id: 'Psychology', labelKey: 'interest.psychology' },
+  { id: 'Education', labelKey: 'interest.education' },
+  { id: 'Everyday life', labelKey: 'interest.everydayLife' },
 ];
 
-export const LEVELS: ReadonlyArray<{ id: Level; name: string; blurb: string }> = [
-  {
-    id: 'beginner',
-    name: 'Beginner',
-    blurb: 'I know basic words and some Present Simple.',
-  },
+export const LEVELS: ReadonlyArray<{ id: Level; nameKey: StringKey; blurbKey: StringKey }> = [
+  { id: 'beginner', nameKey: 'level.beginner.name', blurbKey: 'level.beginner.blurb' },
   {
     id: 'beginner_intermediate',
-    name: 'Beginner-Intermediate',
-    blurb: 'I can get my point across in short sentences.',
+    nameKey: 'level.beginnerIntermediate.name',
+    blurbKey: 'level.beginnerIntermediate.blurb',
   },
   {
     id: 'intermediate',
-    name: 'Intermediate',
-    blurb: 'I can hold short conversations with mistakes.',
+    nameKey: 'level.intermediate.name',
+    blurbKey: 'level.intermediate.blurb',
   },
   {
     id: 'upper_intermediate',
-    name: 'Upper-Intermediate',
-    blurb: 'I write at work but want to sound natural.',
+    nameKey: 'level.upperIntermediate.name',
+    blurbKey: 'level.upperIntermediate.blurb',
   },
 ];
 
-export const GOALS: ReadonlyArray<{ id: string; name: string; blurb: string }> = [
-  {
-    id: 'conversational',
-    name: 'Conversational English',
-    blurb: 'Speak more naturally in everyday situations.',
-  },
-  {
-    id: 'work',
-    name: 'Work communication',
-    blurb: 'Reviews, standups, design docs, Slack threads.',
-  },
-  {
-    id: 'interview',
-    name: 'Technical interviews',
-    blurb: 'Explain systems, trade-offs, and decisions.',
-  },
-  {
-    id: 'travel',
-    name: 'Travel English',
-    blurb: 'Airports, hotels, food, getting around.',
-  },
-  {
-    id: 'fluency',
-    name: 'General fluency',
-    blurb: 'Long-term, sustained improvement.',
-  },
+// Goal `id` is stored on the profile and sent to the AI; name/blurb are i18n.
+export const GOALS: ReadonlyArray<{ id: string; nameKey: StringKey; blurbKey: StringKey }> = [
+  { id: 'conversational', nameKey: 'goal.conversational.name', blurbKey: 'goal.conversational.blurb' },
+  { id: 'work', nameKey: 'goal.work.name', blurbKey: 'goal.work.blurb' },
+  { id: 'interview', nameKey: 'goal.interview.name', blurbKey: 'goal.interview.blurb' },
+  { id: 'travel', nameKey: 'goal.travel.name', blurbKey: 'goal.travel.blurb' },
+  { id: 'fluency', nameKey: 'goal.fluency.name', blurbKey: 'goal.fluency.blurb' },
 ];

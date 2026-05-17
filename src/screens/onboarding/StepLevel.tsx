@@ -1,6 +1,8 @@
 import { theme as T } from '../../theme';
 import type { Level } from '../../types';
 import { Icon } from '../../ui';
+import { t } from '../../i18n';
+import { useLocale } from '../../i18n/useLocale';
 import { LEVELS } from './options';
 
 type Props = {
@@ -9,6 +11,7 @@ type Props = {
 };
 
 export function StepLevel({ level, onChange }: Props) {
+  const locale = useLocale();
   return (
     <div>
       <div
@@ -21,12 +24,17 @@ export function StepLevel({ level, onChange }: Props) {
           marginBottom: 8,
         }}
       >
-        Where are you
-        <br />
-        right now?
+        {t(locale, 'onboarding.level.title')
+          .split('\n')
+          .map((line, i, arr) => (
+            <span key={i}>
+              {line}
+              {i < arr.length - 1 && <br />}
+            </span>
+          ))}
       </div>
       <div style={{ color: T.muted, fontSize: 14, marginBottom: 24 }}>
-        Be honest — you can change this any time.
+        {t(locale, 'onboarding.level.subtitle')}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -55,11 +63,11 @@ export function StepLevel({ level, onChange }: Props) {
                   justifyContent: 'space-between',
                 }}
               >
-                <div style={{ fontSize: 15.5, fontWeight: 500 }}>{l.name}</div>
+                <div style={{ fontSize: 15.5, fontWeight: 500 }}>{t(locale, l.nameKey)}</div>
                 {on && <Icon.Check s={16} />}
               </div>
               <div style={{ fontSize: 12.5, opacity: 0.7, marginTop: 4, lineHeight: 1.35 }}>
-                {l.blurb}
+                {t(locale, l.blurbKey)}
               </div>
             </button>
           );

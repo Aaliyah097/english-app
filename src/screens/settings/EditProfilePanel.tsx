@@ -9,11 +9,10 @@ import {
 import { theme as T } from '../../theme';
 import type { Level, UserProfile } from '../../types';
 import { Icon } from '../../ui';
+import { t } from '../../i18n';
+import { useLocale } from '../../i18n/useLocale';
 import { ALL_INTERESTS, GOALS, LEVELS, TARGET_LANGUAGES } from '../onboarding/options';
 
-// Re-read on every storage notification. Same pattern as PracticeScreen —
-// simpler than wrangling useSyncExternalStore + a stable selector, and
-// reliable in practice because the profile object is small.
 function useProfile(): UserProfile | null {
   const [, setTick] = useState(0);
   useEffect(() => subscribe(() => setTick((n) => n + 1)), []);
@@ -57,6 +56,7 @@ function SubLabel({ children }: { children: React.ReactNode }) {
 
 export function EditProfilePanel() {
   const profile = useProfile();
+  const locale = useLocale();
   if (!profile) return null;
 
   const updateProfile = (patch: Partial<UserProfile>) => {
@@ -73,10 +73,9 @@ export function EditProfilePanel() {
   const setTargetLanguage = (code: string) => {
     if (code === profile.targetLanguage) return;
     updateProfile({ targetLanguage: code });
-    // The persisted rule, last-checkpoint summary, and recent-mistakes log
-    // are all in the *previous* target language. Clear them so the AI
-    // regenerates fresh in-language content on the next turn.
     if (getCheckpoint()) {
+      // Language-bound checkpoint fields are stale after the switch — let
+      // the AI regenerate them in the new target language.
       mergeCheckpoint({
         currentLearningFocus: { rule: '' },
         lastCheckpointSummary: '',
@@ -90,7 +89,7 @@ export function EditProfilePanel() {
   return (
     <PanelCard>
       <div>
-        <SubLabel>Learning language</SubLabel>
+        <SubLabel>{t(locale, 'settings.label.learningLanguage')}</SubLabel>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
           {TARGET_LANGUAGES.map((l) => {
             const on = profile.targetLanguage === l.code;
@@ -128,15 +127,15 @@ export function EditProfilePanel() {
       </div>
 
       <div>
-        <SubLabel>Interests</SubLabel>
+        <SubLabel>{t(locale, 'settings.label.interests')}</SubLabel>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
-          {ALL_INTERESTS.map((t) => {
-            const on = profile.interests.includes(t);
+          {ALL_INTERESTS.map(({ id, labelKey }) => {
+            const on = profile.interests.includes(id);
             return (
               <button
-                key={t}
+                key={id}
                 type="button"
-                onClick={() => toggleInterest(t)}
+                onClick={() => toggleInterest(id)}
                 aria-pressed={on}
                 style={{
                   border: `0.5px solid ${on ? T.ink : T.border}`,
@@ -154,7 +153,7 @@ export function EditProfilePanel() {
                 }}
               >
                 {on && <Icon.Check s={12} />}
-                {t}
+                {t(locale, labelKey)}
               </button>
             );
           })}
@@ -162,7 +161,7 @@ export function EditProfilePanel() {
       </div>
 
       <div>
-        <SubLabel>Level</SubLabel>
+        <SubLabel>{t(locale, 'settings.label.level')}</SubLabel>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
           {LEVELS.map((l) => {
             const on = profile.level === l.id;
@@ -190,11 +189,11 @@ export function EditProfilePanel() {
                     justifyContent: 'space-between',
                   }}
                 >
-                  <div style={{ fontSize: 14.5, fontWeight: 500 }}>{l.name}</div>
+                  <div style={{ fontSize: 14.5, fontWeight: 500 }}>{t(locale, l.nameKey)}</div>
                   {on && <Icon.Check s={14} />}
                 </div>
                 <div style={{ fontSize: 12, opacity: 0.7, marginTop: 3, lineHeight: 1.35 }}>
-                  {l.blurb}
+                  {t(locale, l.blurbKey)}
                 </div>
               </button>
             );
@@ -203,15 +202,15 @@ export function EditProfilePanel() {
       </div>
 
       <div>
-        <SubLabel>Goal</SubLabel>
+        <SubLabel>{t(locale, 'settings.label.goal')}</SubLabel>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
           {GOALS.map((g) => {
-            const on = profile.goal === g.name;
+            const on = profile.goal === g.id;
             return (
               <button
                 key={g.id}
                 type="button"
-                onClick={() => setGoal(g.name)}
+                onClick={() => setGoal(g.id)}
                 aria-pressed={on}
                 style={{
                   background: on ? T.ink : T.surface,
@@ -228,8 +227,10 @@ export function EditProfilePanel() {
                 }}
               >
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 500 }}>{g.name}</div>
-                  <div style={{ fontSize: 11.5, opacity: 0.65, marginTop: 2 }}>{g.blurb}</div>
+                  <div style={{ fontSize: 14, fontWeight: 500 }}>{t(locale, g.nameKey)}</div>
+                  <div style={{ fontSize: 11.5, opacity: 0.65, marginTop: 2 }}>
+                    {t(locale, g.blurbKey)}
+                  </div>
                 </div>
                 {on && <Icon.Check s={14} />}
               </button>

@@ -4,18 +4,20 @@ import { setCheckpoint } from '../../storage';
 import { theme as T } from '../../theme';
 import type { LearningCheckpoint, Level, UserProfile } from '../../types';
 import { Btn, Icon } from '../../ui';
+import { t } from '../../i18n';
+import { useLocale } from '../../i18n/useLocale';
 import { StepGoal } from './StepGoal';
 import { StepInterests } from './StepInterests';
 import { StepLanguages } from './StepLanguages';
 import { StepLevel } from './StepLevel';
 import { StepWelcome } from './StepWelcome';
+import { NATIVE_LANGUAGE_CODE } from './options';
 
 type Props = {
   onComplete?: () => void;
 };
 
 type Draft = {
-  nativeLanguage: string;
   targetLanguage: string;
   level: Level;
   interests: string[];
@@ -23,11 +25,10 @@ type Draft = {
 };
 
 const DEFAULT_DRAFT: Draft = {
-  nativeLanguage: 'ru',
   targetLanguage: 'en',
   level: 'intermediate',
   interests: ['Software dev', 'Architecture'],
-  goal: 'Work communication',
+  goal: 'work',
 };
 
 const TOTAL_STEPS = 5;
@@ -35,6 +36,7 @@ const TOTAL_STEPS = 5;
 export function OnboardingScreen({ onComplete }: Props) {
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<Draft>(DEFAULT_DRAFT);
+  const locale = useLocale();
 
   const goBack = () => setStep((s) => Math.max(0, s - 1));
 
@@ -45,7 +47,7 @@ export function OnboardingScreen({ onComplete }: Props) {
     }
     // Final step — persist profile and seeded checkpoint.
     const profile: UserProfile = userProfileSchema.parse({
-      nativeLanguage: draft.nativeLanguage,
+      nativeLanguage: NATIVE_LANGUAGE_CODE,
       targetLanguage: draft.targetLanguage,
       level: draft.level,
       interests: draft.interests,
@@ -58,7 +60,10 @@ export function OnboardingScreen({ onComplete }: Props) {
       currentLearningFocus: {
         grammarTopic: 'Present Simple',
         difficulty: 2,
-        rule: 'Use Present Simple for facts, habits, and routines — e.g. "She drinks coffee every morning."',
+        // Leave the rule empty — the AI fills it on the first turn in the
+        // user's target language. The default rule (per i18n) is the fallback
+        // until then.
+        rule: '',
       },
       recentMistakes: [],
       completedTopics: [],
@@ -86,7 +91,11 @@ export function OnboardingScreen({ onComplete }: Props) {
   };
 
   const ctaLabel =
-    step === 0 ? 'Begin' : step === TOTAL_STEPS - 1 ? 'Start practising' : 'Continue';
+    step === 0
+      ? t(locale, 'onboarding.button.begin')
+      : step === TOTAL_STEPS - 1
+        ? t(locale, 'onboarding.button.startPractising')
+        : t(locale, 'onboarding.button.continue');
 
   return (
     <div
@@ -112,7 +121,7 @@ export function OnboardingScreen({ onComplete }: Props) {
         <button
           type="button"
           onClick={goBack}
-          aria-label="Back"
+          aria-label={t(locale, 'onboarding.button.back')}
           style={{
             background: 'transparent',
             border: 0,
@@ -128,7 +137,7 @@ export function OnboardingScreen({ onComplete }: Props) {
           }}
         >
           <Icon.Left s={18} />
-          <span style={{ fontSize: 14 }}>Back</span>
+          <span style={{ fontSize: 14 }}>{t(locale, 'onboarding.button.back')}</span>
         </button>
         <div style={{ display: 'flex', gap: 5 }} aria-label="Step indicator">
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
@@ -151,9 +160,7 @@ export function OnboardingScreen({ onComplete }: Props) {
         {step === 0 && <StepWelcome />}
         {step === 1 && (
           <StepLanguages
-            native={draft.nativeLanguage}
             target={draft.targetLanguage}
-            onChangeNative={(code) => setDraft((d) => ({ ...d, nativeLanguage: code }))}
             onChangeTarget={(code) => setDraft((d) => ({ ...d, targetLanguage: code }))}
           />
         )}
@@ -169,7 +176,7 @@ export function OnboardingScreen({ onComplete }: Props) {
         {step === 4 && (
           <StepGoal
             goal={draft.goal}
-            onChange={(label) => setDraft((d) => ({ ...d, goal: label }))}
+            onChange={(id) => setDraft((d) => ({ ...d, goal: id }))}
           />
         )}
       </div>

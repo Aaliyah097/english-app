@@ -52,13 +52,13 @@ describe('App', () => {
     render(<App />);
     // S06's StepWelcome shows the "Begin" CTA — assert on that as the
     // smallest stable indicator that we're in the onboarding flow.
-    expect(screen.getByRole('button', { name: /begin/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /начать/i })).toBeInTheDocument();
     expect(screen.queryByTestId('screen-placeholder')).not.toBeInTheDocument();
   });
 
   it('renders the practice screen once a checkpoint exists', () => {
     render(<App />);
-    expect(screen.getByRole('button', { name: /begin/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /начать/i })).toBeInTheDocument();
 
     // Writing the checkpoint (which carries the profile) notifies subscribers
     // and flips the App out of onboarding into the main shell.

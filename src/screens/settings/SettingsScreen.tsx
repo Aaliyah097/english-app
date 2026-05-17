@@ -1,5 +1,7 @@
 import { theme as T } from '../../theme';
 import { Icon, SectionTitle, Shell, TopBar } from '../../ui';
+import { t } from '../../i18n';
+import { useLocale } from '../../i18n/useLocale';
 import { EditProfilePanel } from './EditProfilePanel';
 
 type Props = {
@@ -7,16 +9,17 @@ type Props = {
 };
 
 export function SettingsScreen({ onBack }: Props) {
+  const locale = useLocale();
   return (
     <Shell
       header={
         <TopBar
-          title="Settings"
+          title={t(locale, 'settings.title')}
           left={
             onBack ? (
               <button
                 type="button"
-                aria-label="Back"
+                aria-label={t(locale, 'settings.back.aria')}
                 onClick={onBack}
                 style={{
                   background: T.surface,
@@ -37,7 +40,7 @@ export function SettingsScreen({ onBack }: Props) {
         />
       }
     >
-      <SectionTitle>Edit profile</SectionTitle>
+      <SectionTitle>{t(locale, 'settings.section.editProfile')}</SectionTitle>
       <EditProfilePanel />
     </Shell>
   );

@@ -11,7 +11,7 @@ const SAMPLE_PROFILE: UserProfile = userProfileSchema.parse({
   targetLanguage: 'en',
   level: 'intermediate',
   interests: ['Software dev', 'Architecture'],
-  goal: 'Work communication',
+  goal: 'work',
   preferredPracticeMode: 'translation',
 });
 

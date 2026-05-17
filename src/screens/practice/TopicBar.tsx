@@ -1,6 +1,9 @@
 import { theme as T } from '../../theme';
 import { Icon } from '../../ui';
+import { t } from '../../i18n';
+import { useLocale } from '../../i18n/useLocale';
 import type { LearningCheckpoint } from '../../types';
+import { topicLabelKeyFor } from '../progress/grammarPath';
 
 type Props = {
   checkpoint: LearningCheckpoint;
@@ -12,7 +15,10 @@ type Props = {
 // Top bar showing the current grammar topic (as a clickable button that
 // opens the TopicPicker overlay) + a cog that opens Settings.
 export function TopicBar({ checkpoint, onMenu, onTopicClick, isPickerOpen }: Props) {
+  const locale = useLocale();
   const topic = checkpoint.currentLearningFocus.grammarTopic;
+  const topicKey = topicLabelKeyFor(topic);
+  const topicLabel = topicKey ? t(locale, topicKey) : topic;
 
   return (
     <div
@@ -28,7 +34,7 @@ export function TopicBar({ checkpoint, onMenu, onTopicClick, isPickerOpen }: Pro
         type="button"
         onClick={onTopicClick}
         aria-expanded={isPickerOpen ?? false}
-        aria-label="Switch grammar topic"
+        aria-label={t(locale, 'practice.topicSwitch.aria')}
         style={{
           background: isPickerOpen ? T.surface2 : T.surface,
           border: `0.5px solid ${T.border}`,
@@ -43,13 +49,13 @@ export function TopicBar({ checkpoint, onMenu, onTopicClick, isPickerOpen }: Pro
         }}
       >
         <Icon.Sparkle s={14} />
-        <div style={{ fontSize: 13, fontWeight: 500 }}>{topic}</div>
+        <div style={{ fontSize: 13, fontWeight: 500 }}>{topicLabel}</div>
         <Icon.Down s={14} />
       </button>
 
       <button
         type="button"
-        aria-label="Settings"
+        aria-label={t(locale, 'practice.settings.aria')}
         onClick={onMenu}
         style={{
           width: 30,

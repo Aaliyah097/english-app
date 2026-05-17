@@ -34,11 +34,12 @@ type Req = z.infer<typeof requestSchema>;
 
 function buildSystemPrompt(profile: Req['userProfile']): string {
   return [
-    'You are an AI English tutor.',
-    `The user's native language is "${profile.nativeLanguage}". They are practising "${profile.targetLanguage}" at level "${profile.level}".`,
-    `Their goal: ${profile.goal}.`,
-    'The user translates short sentences from their native language into English.',
-    'Focus on tenses, conditionals, articles, prepositions, and natural conversational English.',
+    `You are a personal language tutor. The user's native language is "${profile.nativeLanguage}" and they are practising "${profile.targetLanguage}" at level "${profile.level}". Their goal: ${profile.goal}.`,
+    `The user translates short sentences from their native language (${profile.nativeLanguage}) into the target language (${profile.targetLanguage}).`,
+    'Focus on tenses, conditionals, articles, prepositions, and natural conversational usage in the target language.',
+    '',
+    `ALL human-readable text you emit (messageToUser, mistakes[].type, mistakes[].explanation, currentLearningFocus.rule, lastCheckpointSummary) MUST be written in the target language: "${profile.targetLanguage}". The ONLY exception is \`nextExercise.sentence\`, which MUST be in the user's NATIVE language ("${profile.nativeLanguage}") — that's the sentence the user will translate FROM.`,
+    `correctedAnswer + mistakes[].example/correction are short fragments in the target language ("${profile.targetLanguage}").`,
     '',
     'Keep explanations short and practical. Do not give long theory.',
     'Correct mistakes clearly. Suggest a more natural alternative only when useful.',
