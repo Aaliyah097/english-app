@@ -152,31 +152,24 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
 
   function handleSubmit() {
     if (phase === 'awaiting') return;
-    if (phase === 'review') {
-      // "Next" CTA — promote the AI's nextExercise and reset input.
-      if (lastResult) {
-        setCurrentExercise(lastResult.nextExercise);
-      }
-      setLastResult(null);
-      setUserAnswer('');
-      setPhase('input');
-      return;
-    }
     if (userAnswer.trim() === '') return;
     void runTurn(userAnswer);
+  }
+
+  function handleNext() {
+    if (lastResult) {
+      setCurrentExercise(lastResult.nextExercise);
+    }
+    setLastResult(null);
+    setUserAnswer('');
+    setPhase('input');
   }
 
   function handleRetry() {
     void runTurn(userAnswer);
   }
 
-  const ctaLabel = phase === 'review' ? 'Next' : 'Check';
-  const placeholder =
-    phase === 'review'
-      ? 'Tap Next for new sentence…'
-      : phase === 'awaiting'
-        ? 'Checking…'
-        : 'Type your translation…';
+  const placeholder = phase === 'awaiting' ? 'Checking…' : 'Type your translation…';
 
   const diffTokens = useMemo(() => {
     if (!lastResult?.correctedAnswer) return null;
@@ -318,14 +311,41 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
         )}
       </div>
 
-      <InputDock
-        value={userAnswer}
-        onChange={setUserAnswer}
-        onSubmit={handleSubmit}
-        placeholder={placeholder}
-        cta={ctaLabel}
-        disabled={phase === 'awaiting'}
-      />
+      {phase === 'review' ? (
+        <NextDock onNext={handleNext} />
+      ) : (
+        <InputDock
+          value={userAnswer}
+          onChange={setUserAnswer}
+          onSubmit={handleSubmit}
+          placeholder={placeholder}
+          cta="Check"
+          disabled={phase === 'awaiting'}
+        />
+      )}
+    </div>
+  );
+}
+
+// Replaces the InputDock in the review phase: a single full-width "Next
+// exercise" CTA at the same vertical position. Avoids showing a dead input
+// field when the AI has already corrected the user's answer.
+function NextDock({ onNext }: { onNext: () => void }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        bottom: 98,
+        left: 0,
+        right: 0,
+        padding: '8px 14px 8px',
+        background: `linear-gradient(to top, ${T.bg} 70%, transparent)`,
+        zIndex: 25,
+      }}
+    >
+      <Btn kind="accent" size="lg" full icon={<Icon.Arrow s={16} />} onClick={onNext}>
+        Next exercise
+      </Btn>
     </div>
   );
 }

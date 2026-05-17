@@ -189,13 +189,19 @@ describe('PracticeScreen', () => {
     await user.click(screen.getByRole('button', { name: /check/i }));
 
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument(),
+      expect(screen.getByRole('button', { name: /next exercise/i })).toBeInTheDocument(),
     );
 
-    await user.click(screen.getByRole('button', { name: /next/i }));
+    // In review phase the InputDock is replaced by a single Next CTA — the
+    // translation input shouldn't be in the DOM at all.
+    expect(screen.queryByLabelText(/translation input/i)).not.toBeInTheDocument();
 
+    await user.click(screen.getByRole('button', { name: /next exercise/i }));
+
+    // Back in input phase: new exercise sentence, fresh empty input, Check CTA.
     expect(screen.getByText(secondExercise.sentence)).toBeInTheDocument();
-    expect(input.value).toBe('');
+    const newInput = screen.getByLabelText(/translation input/i) as HTMLInputElement;
+    expect(newInput.value).toBe('');
     expect(screen.getByRole('button', { name: /check/i })).toBeInTheDocument();
   });
 
