@@ -1,58 +1,44 @@
-import { lazy, Suspense } from 'react';
-import { theme as T } from './theme';
+import { useState, type ComponentType } from 'react';
+import { BottomNav, type ScreenId } from './ui';
+import {
+  OnboardingScreen,
+  PracticeScreen,
+  ProgressScreen,
+  SettingsScreen,
+} from './screens';
+import { getUserProfile } from './storage';
+import { useStorageSnapshot } from './storage/useStorageSnapshot';
 
-// Dev-only playground. In prod builds, the if-branch is dead code and Vite
-// tree-shakes the dynamic import away, so the playground bundle never ships.
-const Playground = import.meta.env.DEV ? lazy(() => import('./ui/__playground').then((m) => ({ default: m.Playground }))) : null;
+const SCREENS: Record<ScreenId, ComponentType> = {
+  practice: PracticeScreen,
+  progress: ProgressScreen,
+  settings: SettingsScreen,
+};
+
+// useStorageSnapshot is backed by useSyncExternalStore, which requires the
+// selector to return a stable reference between renders unless the data has
+// actually changed. `getUserProfile` deserialises fresh on each call, so we
+// project it down to a primitive (presence) — that's all the App shell needs
+// to gate onboarding vs. the main app.
+const hasProfileSelector = () => getUserProfile() != null;
 
 export function App() {
-  if (Playground) {
-    return (
-      <Suspense fallback={<Wordmark />}>
-        <Playground />
-      </Suspense>
-    );
-  }
-  return <Wordmark />;
-}
+  // Re-renders on every storage notification (profile, checkpoint, api key, etc.).
+  const hasProfile = useStorageSnapshot(hasProfileSelector);
+  const [active, setActive] = useState<ScreenId>('practice');
 
-function Wordmark() {
+  if (!hasProfile) {
+    // S06 owns the real onboarding flow and calls setUserProfile itself, which
+    // notifies subscribers and re-renders us into the main app.
+    return <OnboardingScreen onComplete={() => {}} />;
+  }
+
+  const ActiveScreen = SCREENS[active];
+
   return (
-    <div
-      style={{
-        position: 'absolute',
-        inset: 0,
-        background: T.bg,
-        color: T.ink,
-        display: 'grid',
-        placeItems: 'center',
-        fontFamily: T.fontBody,
-      }}
-    >
-      <div style={{ textAlign: 'center' }}>
-        <div
-          style={{
-            fontFamily: T.fontDisplay,
-            fontStyle: 'italic',
-            fontSize: 42,
-            letterSpacing: -0.8,
-            marginBottom: 8,
-          }}
-        >
-          Englishly
-        </div>
-        <div
-          style={{
-            fontFamily: T.fontMono,
-            fontSize: 11,
-            color: T.muted,
-            letterSpacing: 1.4,
-            textTransform: 'uppercase',
-          }}
-        >
-          v0.1 · scaffolding
-        </div>
-      </div>
-    </div>
+    <>
+      <ActiveScreen />
+      <BottomNav active={active} onChange={setActive} />
+    </>
   );
 }
