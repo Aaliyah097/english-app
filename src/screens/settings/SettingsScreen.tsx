@@ -1,6 +1,5 @@
 import { theme as T } from '../../theme';
 import { Icon, SectionTitle, Shell, TopBar } from '../../ui';
-import { DataPanel } from './DataPanel';
 import { EditProfilePanel } from './EditProfilePanel';
 
 type Props = {
@@ -40,9 +39,6 @@ export function SettingsScreen({ onBack }: Props) {
     >
       <SectionTitle>Edit profile</SectionTitle>
       <EditProfilePanel />
-
-      <SectionTitle>Your data</SectionTitle>
-      <DataPanel />
     </Shell>
   );
 }
