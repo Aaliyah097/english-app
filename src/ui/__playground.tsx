@@ -3,7 +3,6 @@ import { theme as T } from '../theme';
 import {
   Btn,
   Bubble,
-  BottomNav,
   Chip,
   Icon,
   InputDock,
@@ -11,14 +10,12 @@ import {
   Shell,
   TopBar,
   TypingDot,
-  type ScreenId,
 } from './index';
 
 // Dev-only visual sanity check. Mounted by App.tsx when import.meta.env.DEV.
 // Renders every primitive at least once so we can spot drift from the mockup.
 
 export function Playground() {
-  const [tab, setTab] = useState<ScreenId>('practice');
   const [text, setText] = useState('');
 
   return (
@@ -31,7 +28,6 @@ export function Playground() {
           right={<Icon.Cog s={18} />}
         />
       }
-      footer={<BottomNav active={tab} onChange={setTab} />}
     >
       <SectionTitle>Chips</SectionTitle>
       <div style={row}>

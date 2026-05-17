@@ -257,8 +257,8 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
         style={{
           flex: 1,
           overflow: 'auto',
-          // Bottom padding clears the InputDock (~64px) + BottomNav (~98px).
-          padding: '18px 18px 180px',
+          // Bottom padding clears the InputDock (~64px tall, sits at bottom: 30).
+          padding: '18px 18px 110px',
           display: 'flex',
           flexDirection: 'column',
           gap: 10,
@@ -399,7 +399,7 @@ function NextDock({ onNext }: { onNext: () => void }) {
     <div
       style={{
         position: 'absolute',
-        bottom: 98,
+        bottom: 30,
         left: 0,
         right: 0,
         padding: '8px 14px 8px',

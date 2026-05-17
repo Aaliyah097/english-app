@@ -68,19 +68,21 @@ describe('App', () => {
     });
 
     expect(screen.getByTestId('practice-screen')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /practice/i })).toBeInTheDocument();
   });
 
-  it('switches the active screen when a BottomNav tab is clicked', async () => {
+  it('opens Settings from the TopicBar cog and returns via Back', async () => {
     setUserProfile(profile);
     setCheckpoint(checkpoint);
     render(<App />);
 
     expect(screen.getByTestId('practice-screen')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByTestId('nav-settings'));
-
-    // Practice screen is no longer mounted; Settings rendered in its place.
+    // The cog in PracticeScreen's TopicBar has aria-label="Settings".
+    await userEvent.click(screen.getByRole('button', { name: /settings/i }));
     expect(screen.queryByTestId('practice-screen')).not.toBeInTheDocument();
+
+    // Back returns to Practice.
+    await userEvent.click(screen.getByRole('button', { name: /back/i }));
+    expect(screen.getByTestId('practice-screen')).toBeInTheDocument();
   });
 });

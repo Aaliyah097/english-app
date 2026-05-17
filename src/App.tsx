@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { BottomNav, type ScreenId } from './ui';
 import { OnboardingScreen, PracticeScreen, SettingsScreen } from './screens';
 import { getUserProfile } from './storage';
 import { useStorageSnapshot } from './storage/useStorageSnapshot';
@@ -12,21 +11,14 @@ import { useStorageSnapshot } from './storage/useStorageSnapshot';
 const hasProfileSelector = () => getUserProfile() != null;
 
 export function App() {
-  // Re-renders on every storage notification.
   const hasProfile = useStorageSnapshot(hasProfileSelector);
-  const [active, setActive] = useState<ScreenId>('practice');
+  const [showSettings, setShowSettings] = useState(false);
 
   if (!hasProfile) {
     return <OnboardingScreen onComplete={() => {}} />;
   }
-
-  return (
-    <>
-      {active === 'practice' && (
-        <PracticeScreen onMenu={() => setActive('settings')} />
-      )}
-      {active === 'settings' && <SettingsScreen />}
-      <BottomNav active={active} onChange={setActive} />
-    </>
-  );
+  if (showSettings) {
+    return <SettingsScreen onBack={() => setShowSettings(false)} />;
+  }
+  return <PracticeScreen onMenu={() => setShowSettings(true)} />;
 }

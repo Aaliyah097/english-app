@@ -30,10 +30,8 @@ export function InputDock({
     <div
       style={{
         position: 'absolute',
-        // Sits above BottomNav (~98px tall: 30 bottom pad + 60 nav + 8 top pad).
-        // BottomNav already handles the iOS home-indicator safe area, so we
-        // only need a tiny gap here.
-        bottom: 98,
+        // Bottom dock with a small gap above the iOS home-indicator safe area.
+        bottom: 30,
         left: 0,
         right: 0,
         padding: '8px 14px 8px',
