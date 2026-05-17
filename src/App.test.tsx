@@ -21,7 +21,6 @@ const profile: UserProfile = {
   targetLanguage: 'en',
   level: 'intermediate',
   interests: ['software development'],
-  goal: 'work',
   preferredPracticeMode: 'translation',
 };
 

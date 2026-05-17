@@ -7,7 +7,6 @@ const profile: UserProfile = {
   targetLanguage: 'en',
   level: 'intermediate',
   interests: [],
-  goal: 'work',
   preferredPracticeMode: 'translation',
 };
 const checkpoint: LearningCheckpoint = {

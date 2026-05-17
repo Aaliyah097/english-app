@@ -8,13 +8,10 @@ import {
 } from '../../storage';
 import { theme as T } from '../../theme';
 import type { Level, UserProfile } from '../../types';
-import type { goalIdSchema } from '../../schemas';
-import type { z } from 'zod';
-type GoalId = z.infer<typeof goalIdSchema>;
 import { Icon } from '../../ui';
 import { t } from '../../i18n';
 import { useLocale } from '../../i18n/useLocale';
-import { ALL_INTERESTS, GOALS, LEVELS, TARGET_LANGUAGES } from '../onboarding/options';
+import { ALL_INTERESTS, LEVELS, TARGET_LANGUAGES } from '../onboarding/options';
 
 function useProfile(): UserProfile | null {
   const [, setTick] = useState(0);
@@ -87,7 +84,6 @@ export function EditProfilePanel() {
     }
   };
   const setLevel = (level: Level) => updateProfile({ level });
-  const setGoal = (goal: GoalId) => updateProfile({ goal });
 
   return (
     <PanelCard>
@@ -204,43 +200,6 @@ export function EditProfilePanel() {
         </div>
       </div>
 
-      <div>
-        <SubLabel>{t(locale, 'settings.label.goal')}</SubLabel>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
-          {GOALS.map((g) => {
-            const on = profile.goal === g.id;
-            return (
-              <button
-                key={g.id}
-                type="button"
-                onClick={() => setGoal(g.id)}
-                aria-pressed={on}
-                style={{
-                  background: on ? T.ink : T.surface,
-                  color: on ? T.bg : T.ink,
-                  border: `0.5px solid ${on ? T.ink : T.border}`,
-                  borderRadius: 14,
-                  padding: '10px 14px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 10,
-                }}
-              >
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 500 }}>{t(locale, g.nameKey)}</div>
-                  <div style={{ fontSize: 11.5, opacity: 0.65, marginTop: 2 }}>
-                    {t(locale, g.blurbKey)}
-                  </div>
-                </div>
-                {on && <Icon.Check s={14} />}
-              </button>
-            );
-          })}
-        </div>
-      </div>
     </PanelCard>
   );
 }

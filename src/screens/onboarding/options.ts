@@ -1,12 +1,8 @@
 // Shared option lists for the onboarding steps. Settings (S11) reuses these so
 // the two surfaces never drift. Keep behaviour identical to S06.
 
-import type { z } from 'zod';
-import type { goalIdSchema } from '../../schemas';
 import type { StringKey } from '../../i18n/strings';
 import type { Level } from '../../types';
-
-type GoalId = z.infer<typeof goalIdSchema>;
 
 // v1 assumes all users are native Russian speakers — no native-language picker.
 // The native code is hardcoded as 'ru' wherever we need it.
@@ -62,12 +58,3 @@ export const LEVELS: ReadonlyArray<{ id: Level; nameKey: StringKey; blurbKey: St
   },
 ];
 
-// Goal `id` is stored on the profile and sent to the AI; name/blurb are i18n.
-// The IDs match goalIdSchema (a closed enum the request validator enforces).
-export const GOALS: ReadonlyArray<{ id: GoalId; nameKey: StringKey; blurbKey: StringKey }> = [
-  { id: 'conversational', nameKey: 'goal.conversational.name', blurbKey: 'goal.conversational.blurb' },
-  { id: 'work', nameKey: 'goal.work.name', blurbKey: 'goal.work.blurb' },
-  { id: 'interview', nameKey: 'goal.interview.name', blurbKey: 'goal.interview.blurb' },
-  { id: 'travel', nameKey: 'goal.travel.name', blurbKey: 'goal.travel.blurb' },
-  { id: 'fluency', nameKey: 'goal.fluency.name', blurbKey: 'goal.fluency.blurb' },
-];

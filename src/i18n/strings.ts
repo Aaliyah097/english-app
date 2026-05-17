@@ -39,7 +39,6 @@ const ru = {
   'settings.label.learningLanguage': 'Изучаемый язык',
   'settings.label.interests': 'Интересы',
   'settings.label.level': 'Уровень',
-  'settings.label.goal': 'Цель',
 
   // ── Onboarding ──────────────────────────────────────────────────────────
   'onboarding.button.begin': 'Начать',
@@ -64,10 +63,6 @@ const ru = {
   'onboarding.interests.subtitle':
     'На этих темах будут строиться предложения. {count} выбрано.',
 
-  'onboarding.goal.title': 'И одна цель, к которой вы идёте.',
-  'onboarding.goal.subtitle':
-    'Это формирует тон корректировок — формальный или разговорный.',
-
   // ── Level names + blurbs ────────────────────────────────────────────────
   'level.beginner.name': 'Начинающий',
   'level.beginner.blurb':
@@ -81,21 +76,6 @@ const ru = {
   'level.upperIntermediate.name': 'Выше среднего',
   'level.upperIntermediate.blurb':
     'Пишу по работе, но хочу звучать естественнее.',
-
-  // ── Goal names + blurbs ─────────────────────────────────────────────────
-  'goal.conversational.name': 'Разговорный язык',
-  'goal.conversational.blurb':
-    'Говорить естественнее в повседневных ситуациях.',
-  'goal.work.name': 'Рабочее общение',
-  'goal.work.blurb':
-    'Ревью, стендапы, дизайн-доки, переписка в Slack.',
-  'goal.interview.name': 'Технические собеседования',
-  'goal.interview.blurb':
-    'Объяснять системы, trade-offs и решения.',
-  'goal.travel.name': 'Путешествия',
-  'goal.travel.blurb': 'Аэропорты, отели, еда, ориентирование.',
-  'goal.fluency.name': 'Общая беглость',
-  'goal.fluency.blurb': 'Долгосрочное системное развитие.',
 
   // ── Interests ───────────────────────────────────────────────────────────
   'interest.softwareDev': 'Разработка',
@@ -185,7 +165,6 @@ const en: Record<keyof typeof ru, string> = {
   'settings.label.learningLanguage': 'Learning language',
   'settings.label.interests': 'Interests',
   'settings.label.level': 'Level',
-  'settings.label.goal': 'Goal',
 
   'onboarding.button.begin': 'Begin',
   'onboarding.button.continue': 'Continue',
@@ -207,10 +186,6 @@ const en: Record<keyof typeof ru, string> = {
   'onboarding.interests.subtitle':
     "We'll draw sentences from these. {count} selected.",
 
-  'onboarding.goal.title': "And one thing\nyou're aiming for.",
-  'onboarding.goal.subtitle':
-    'This shapes the tone of corrections — formal or casual.',
-
   'level.beginner.name': 'Beginner',
   'level.beginner.blurb': 'I know basic words and some Present Simple.',
   'level.beginnerIntermediate.name': 'Beginner-Intermediate',
@@ -221,18 +196,6 @@ const en: Record<keyof typeof ru, string> = {
   'level.upperIntermediate.name': 'Upper-Intermediate',
   'level.upperIntermediate.blurb':
     'I write at work but want to sound natural.',
-
-  'goal.conversational.name': 'Conversational',
-  'goal.conversational.blurb':
-    'Speak more naturally in everyday situations.',
-  'goal.work.name': 'Work communication',
-  'goal.work.blurb': 'Reviews, standups, design docs, Slack threads.',
-  'goal.interview.name': 'Technical interviews',
-  'goal.interview.blurb': 'Explain systems, trade-offs, and decisions.',
-  'goal.travel.name': 'Travel',
-  'goal.travel.blurb': 'Airports, hotels, food, getting around.',
-  'goal.fluency.name': 'General fluency',
-  'goal.fluency.blurb': 'Long-term, sustained improvement.',
 
   'interest.softwareDev': 'Software dev',
   'interest.architecture': 'Architecture',
@@ -318,7 +281,6 @@ const es: Record<keyof typeof ru, string> = {
   'settings.label.learningLanguage': 'Idioma que aprendes',
   'settings.label.interests': 'Intereses',
   'settings.label.level': 'Nivel',
-  'settings.label.goal': 'Objetivo',
 
   'onboarding.button.begin': 'Empezar',
   'onboarding.button.continue': 'Continuar',
@@ -342,10 +304,6 @@ const es: Record<keyof typeof ru, string> = {
   'onboarding.interests.subtitle':
     'Sacaremos frases de estos temas. {count} seleccionados.',
 
-  'onboarding.goal.title': 'Y un objetivo\nque tengas en mente.',
-  'onboarding.goal.subtitle':
-    'Esto define el tono de las correcciones — formal o informal.',
-
   'level.beginner.name': 'Principiante',
   'level.beginner.blurb': 'Conozco palabras básicas y algo de presente.',
   'level.beginnerIntermediate.name': 'Pre-intermedio',
@@ -357,18 +315,6 @@ const es: Record<keyof typeof ru, string> = {
   'level.upperIntermediate.name': 'Intermedio alto',
   'level.upperIntermediate.blurb':
     'Escribo en el trabajo pero quiero sonar natural.',
-
-  'goal.conversational.name': 'Conversación',
-  'goal.conversational.blurb':
-    'Hablar con naturalidad en situaciones del día a día.',
-  'goal.work.name': 'Comunicación laboral',
-  'goal.work.blurb': 'Reviews, standups, documentos, Slack.',
-  'goal.interview.name': 'Entrevistas técnicas',
-  'goal.interview.blurb': 'Explicar sistemas, trade-offs y decisiones.',
-  'goal.travel.name': 'Viajes',
-  'goal.travel.blurb': 'Aeropuertos, hoteles, comida, orientarse.',
-  'goal.fluency.name': 'Fluidez general',
-  'goal.fluency.blurb': 'Mejora sostenida a largo plazo.',
 
   'interest.softwareDev': 'Desarrollo',
   'interest.architecture': 'Arquitectura',
@@ -454,7 +400,6 @@ const it: Record<keyof typeof ru, string> = {
   'settings.label.learningLanguage': 'Lingua che impari',
   'settings.label.interests': 'Interessi',
   'settings.label.level': 'Livello',
-  'settings.label.goal': 'Obiettivo',
 
   'onboarding.button.begin': 'Inizia',
   'onboarding.button.continue': 'Continua',
@@ -478,10 +423,6 @@ const it: Record<keyof typeof ru, string> = {
   'onboarding.interests.subtitle':
     'Prenderemo le frasi da questi temi. {count} selezionati.',
 
-  'onboarding.goal.title': 'E un obiettivo\nche hai in mente.',
-  'onboarding.goal.subtitle':
-    'Questo definisce il tono delle correzioni — formale o informale.',
-
   'level.beginner.name': 'Principiante',
   'level.beginner.blurb': 'Conosco parole base e un po\' di presente.',
   'level.beginnerIntermediate.name': 'Pre-intermedio',
@@ -493,18 +434,6 @@ const it: Record<keyof typeof ru, string> = {
   'level.upperIntermediate.name': 'Intermedio alto',
   'level.upperIntermediate.blurb':
     'Scrivo al lavoro ma voglio suonare naturale.',
-
-  'goal.conversational.name': 'Conversazione',
-  'goal.conversational.blurb':
-    'Parlare in modo più naturale nella vita quotidiana.',
-  'goal.work.name': 'Comunicazione al lavoro',
-  'goal.work.blurb': 'Review, standup, documenti, Slack.',
-  'goal.interview.name': 'Colloqui tecnici',
-  'goal.interview.blurb': 'Spiegare sistemi, trade-off e decisioni.',
-  'goal.travel.name': 'Viaggi',
-  'goal.travel.blurb': 'Aeroporti, hotel, cibo, orientarsi.',
-  'goal.fluency.name': 'Fluenza generale',
-  'goal.fluency.blurb': 'Miglioramento sostenuto nel lungo periodo.',
 
   'interest.softwareDev': 'Sviluppo',
   'interest.architecture': 'Architettura',

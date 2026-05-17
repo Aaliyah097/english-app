@@ -32,13 +32,13 @@ describe('OnboardingScreen', () => {
     ).toBeInTheDocument();
   });
 
-  it('walks through all five steps and persists a valid profile + checkpoint', async () => {
+  it('walks through all four steps and persists a valid profile + checkpoint', async () => {
     const user = userEvent.setup();
     const onComplete = vi.fn();
     render(<OnboardingScreen onComplete={onComplete} />);
 
+    // Welcome → Begin → Languages → Continue → Level → Continue → Interests → Start.
     await user.click(screen.getByRole('button', { name: RU('onboarding.button.begin') }));
-    await user.click(screen.getByRole('button', { name: RU('onboarding.button.continue') }));
     await user.click(screen.getByRole('button', { name: RU('onboarding.button.continue') }));
     await user.click(screen.getByRole('button', { name: RU('onboarding.button.continue') }));
     await user.click(
@@ -59,7 +59,6 @@ describe('OnboardingScreen', () => {
     expect(profile?.nativeLanguage).toBe('ru');
     expect(profile?.targetLanguage).toBe('en');
     expect(profile?.preferredPracticeMode).toBe('translation');
-    expect(profile?.goal).toBe('work');
     expect(checkpoint?.currentLearningFocus.grammarTopic).toBe('Present Simple');
   });
 });

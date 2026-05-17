@@ -6,7 +6,6 @@ import type { LearningCheckpoint, Level, UserProfile } from '../../types';
 import { Btn, Icon } from '../../ui';
 import { t } from '../../i18n';
 import { useLocale } from '../../i18n/useLocale';
-import { StepGoal } from './StepGoal';
 import { StepInterests } from './StepInterests';
 import { StepLanguages } from './StepLanguages';
 import { StepLevel } from './StepLevel';
@@ -21,17 +20,15 @@ type Draft = {
   targetLanguage: string;
   level: Level;
   interests: string[];
-  goal: string;
 };
 
 const DEFAULT_DRAFT: Draft = {
   targetLanguage: 'en',
   level: 'intermediate',
   interests: ['Software dev', 'Architecture'],
-  goal: 'work',
 };
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 4;
 
 export function OnboardingScreen({ onComplete }: Props) {
   const [step, setStep] = useState(0);
@@ -51,7 +48,6 @@ export function OnboardingScreen({ onComplete }: Props) {
       targetLanguage: draft.targetLanguage,
       level: draft.level,
       interests: draft.interests,
-      goal: draft.goal,
       preferredPracticeMode: 'translation',
     });
 
@@ -172,12 +168,6 @@ export function OnboardingScreen({ onComplete }: Props) {
         )}
         {step === 3 && (
           <StepInterests selected={draft.interests} onToggle={toggleInterest} />
-        )}
-        {step === 4 && (
-          <StepGoal
-            goal={draft.goal}
-            onChange={(id) => setDraft((d) => ({ ...d, goal: id }))}
-          />
         )}
       </div>
 

@@ -12,16 +12,6 @@ export const levelSchema = z.enum([
   'upper_intermediate',
 ]);
 
-// Goals are a closed set (user-set only — the AI never changes it), so a
-// strict enum keeps a tampered request payload from injecting a long string.
-export const goalIdSchema = z.enum([
-  'conversational',
-  'work',
-  'interview',
-  'travel',
-  'fluency',
-]);
-
 export const userProfileSchema = z.object({
   // Language codes are short — capping to a sane length prevents a tampered
   // payload from stuffing the prompt with a giant "language code".
@@ -32,7 +22,6 @@ export const userProfileSchema = z.object({
   // for the user's onboarding choices without allowing prompt bloat. Per-item
   // length cap blocks the "single 250KB interest string" vector.
   interests: z.array(z.string().min(1).max(50)).max(20),
-  goal: goalIdSchema,
   preferredPracticeMode: z.literal('translation'),
 });
 

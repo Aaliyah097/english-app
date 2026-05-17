@@ -13,7 +13,6 @@ const validProfile: UserProfile = {
   targetLanguage: 'en',
   level: 'intermediate',
   interests: ['software development'],
-  goal: 'work',
   preferredPracticeMode: 'translation',
 };
 
@@ -114,11 +113,6 @@ describe('schemas', () => {
   });
 
   // ── Security: length caps + closed-set enforcement ────────────────────────
-
-  it('userProfileSchema rejects an unknown goal id', () => {
-    const bad = { ...validProfile, goal: 'pirate-mode' };
-    expect(userProfileSchema.safeParse(bad).success).toBe(false);
-  });
 
   it('userProfileSchema rejects an oversized interest string', () => {
     const bad = { ...validProfile, interests: ['x'.repeat(100)] };
