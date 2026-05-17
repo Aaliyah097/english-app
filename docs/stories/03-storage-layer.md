@@ -31,10 +31,6 @@ setCheckpoint(c: LearningCheckpoint): void
 mergeCheckpoint(patch: Partial<LearningCheckpoint>): LearningCheckpoint
 // merge respects nested objects shallowly — see §5 step 3
 
-// BYOK
-getApiKey(): string | null
-setApiKey(key: string | null): void  // null clears
-
 // Whole-app
 exportAll(): string             // JSON string, schema-validated
 importAll(json: string): void   // throws on schema mismatch
@@ -47,7 +43,8 @@ subscribe(listener: () => void): () => void
 All persisted blobs live under namespaced keys:
 - `englishly:v1:profile`
 - `englishly:v1:checkpoint`
-- `englishly:v1:apiKey` (note: kept out of `exportAll` / `importAll`)
+
+(There is no `apiKey` — the DeepSeek key lives server-side in the Vercel function; see `docs/PLAN.md` §1.)
 
 ## 5. Task breakdown
 1. Internal helpers `readJson<T>(key, schema): T | null` and `writeJson(key, value)` — wraps `JSON.parse` in try/catch; runs Zod `safeParse`; returns `null` on miss or invalid.
@@ -92,7 +89,7 @@ npm run test -- --run src/storage
 - Settings UI (S11) — this story just provides the API.
 - IndexedDB migration (post-MVP).
 - Multi-device sync.
-- Encrypting the API key at rest (localStorage is unencrypted; we accept this for BYOK and surface it in S11's UI).
+- API-key storage of any kind. The DeepSeek key lives in the Vercel function's env vars (see S04).
 
 ## 10. Notes / open questions
 None.

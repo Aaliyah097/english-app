@@ -1,25 +1,39 @@
 # Englishly
 
-Local-first AI English tutor. Translate sentences from your native language, get short corrections, save progress on-device. Powered by DeepSeek via BYOK (you bring your own API key).
+Local-first AI English tutor. Translate sentences from your native language, get short corrections, save progress on-device. Backed by DeepSeek via a Vercel serverless function that holds the API key server-side.
 
 See **[`docs/PLAN.md`](docs/PLAN.md)** for the development plan and **[`docs/stories/`](docs/stories/)** for the per-story implementation briefs.
 
 ## Running locally
 
 ```bash
-nvm use            # Node 20 (see .nvmrc); Node 18.19+ also works locally
+nvm use            # Node 20 (see .nvmrc)
 npm install
+
+# Local dev with the serverless function:
+#   1. Install Vercel CLI once:  npm i -g vercel
+#   2. Create .env.local with:   DEEPSEEK_API_KEY=sk-...
+#   3. Run the full stack:       vercel dev   # http://localhost:3000
+
+# Frontend-only (no /api/tutor — Practice will show network errors):
 npm run dev        # http://localhost:5173
+
+# Verifications:
 npm run typecheck
 npm run lint
 npm run test
 npm run build && npm run preview
 ```
 
-## Deploying to GitHub Pages
+## Deploying to Vercel
 
 1. Push this repo to GitHub.
-2. **Settings → Pages → Source: GitHub Actions** (one-time toggle).
-3. Push to `main`. The workflow at [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds, runs tests, and publishes.
+2. Import the repo at [vercel.com/new](https://vercel.com/new). Vercel auto-detects Vite.
+3. **Project → Settings → Environment Variables → Add** `DEEPSEEK_API_KEY` (and optionally `DEEPSEEK_MODEL`, defaults to `deepseek-chat`).
+4. Push to `main`. Vercel builds and deploys automatically; the frontend is served as a static SPA and `/api/tutor` runs as a serverless function.
 
-`vite.config.ts` reads the sub-path from the `BASE_PATH` env var; the workflow sets it to `/<repo-name>/` automatically.
+The static bundle never contains the DeepSeek key — it lives in the serverless function's environment.
+
+## CI
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs typecheck, lint, tests, and build on push/PR to `main`. It does not deploy — Vercel's GitHub integration handles deploys.

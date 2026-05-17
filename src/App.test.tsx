@@ -9,7 +9,10 @@ vi.mock('./ai', async () => {
   const actual = await vi.importActual<typeof import('./ai')>('./ai');
   return {
     ...actual,
-    requestTutorTurn: vi.fn(async () => ({ kind: 'no-key' as const })),
+    requestTutorTurn: vi.fn(async () => ({
+      kind: 'network-error' as const,
+      message: 'mocked',
+    })),
   };
 });
 

@@ -102,7 +102,7 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
   const [lastResult, setLastResult] = useState<TutorResponse | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
   const [errorKind, setErrorKind] = useState<
-    'no-key' | 'network-error' | 'invalid-response' | null
+    'network-error' | 'invalid-response' | null
   >(null);
 
   const tutor = useTutorTurn();
@@ -143,12 +143,6 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
       } else {
         setPhase('review');
       }
-      return;
-    }
-    if (result.kind === 'no-key') {
-      setErrorKind('no-key');
-      setLastError(null);
-      setPhase('error');
       return;
     }
     setErrorKind(result.kind);
@@ -307,19 +301,8 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
           </Bubble>
         )}
 
-        {/* Error states */}
-        {phase === 'error' && errorKind === 'no-key' && (
-          <Bubble side="ai">
-            <div style={{ fontSize: 14, lineHeight: 1.5, marginBottom: 10 }}>
-              Add your DeepSeek API key in Settings to start practising.
-            </div>
-            <Btn kind="primary" size="sm" onClick={() => onMenu?.()}>
-              Open Settings
-            </Btn>
-          </Bubble>
-        )}
-
-        {phase === 'error' && errorKind !== 'no-key' && (
+        {/* Error state — server returned non-2xx or upstream returned bad JSON. */}
+        {phase === 'error' && errorKind != null && (
           <Bubble side="ai">
             <div style={{ fontSize: 14, lineHeight: 1.5, marginBottom: 10, color: T.accentInk }}>
               {lastError ?? 'Something went wrong.'}

@@ -2,13 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { LearningCheckpoint, UserProfile } from '../types';
 import {
   exportAll,
-  getApiKey,
   getCheckpoint,
   getUserProfile,
   importAll,
   mergeCheckpoint,
   resetAll,
-  setApiKey,
   setCheckpoint,
   setUserProfile,
   subscribe,
@@ -103,22 +101,6 @@ describe('storage — checkpoint', () => {
   });
 });
 
-describe('storage — apiKey', () => {
-  it('round-trips and trims', () => {
-    setApiKey('  sk-test-123  ');
-    expect(getApiKey()).toBe('sk-test-123');
-  });
-
-  it('clears when set to null or empty', () => {
-    setApiKey('sk-test');
-    setApiKey(null);
-    expect(getApiKey()).toBeNull();
-    setApiKey('sk-test');
-    setApiKey('   ');
-    expect(getApiKey()).toBeNull();
-  });
-});
-
 describe('storage — export/import/reset', () => {
   it('exportAll → importAll round-trips profile + checkpoint', () => {
     setUserProfile(profile);
@@ -133,14 +115,6 @@ describe('storage — export/import/reset', () => {
     expect(getCheckpoint()).toEqual(checkpoint);
   });
 
-  it('exportAll does not include the api key', () => {
-    setApiKey('sk-secret');
-    setUserProfile(profile);
-    const exported = exportAll();
-    expect(exported).not.toContain('sk-secret');
-    expect(exported).not.toContain('apiKey');
-  });
-
   it('importAll rejects malformed JSON without touching existing state', () => {
     setUserProfile(profile);
     expect(() => importAll('not json')).toThrow(/JSON/);
@@ -153,14 +127,12 @@ describe('storage — export/import/reset', () => {
     expect(getUserProfile()).toEqual(profile);
   });
 
-  it('resetAll clears everything including the api key', () => {
+  it('resetAll clears profile and checkpoint', () => {
     setUserProfile(profile);
     setCheckpoint(checkpoint);
-    setApiKey('sk-secret');
     resetAll();
     expect(getUserProfile()).toBeNull();
     expect(getCheckpoint()).toBeNull();
-    expect(getApiKey()).toBeNull();
   });
 });
 
@@ -169,13 +141,11 @@ describe('storage — pub-sub', () => {
     const listener = vi.fn();
     const unsubscribe = subscribe(listener);
     setUserProfile(profile);
-    setApiKey('sk');
-    setApiKey(null);
     setCheckpoint(checkpoint);
-    expect(listener.mock.calls.length).toBeGreaterThanOrEqual(4);
+    expect(listener.mock.calls.length).toBeGreaterThanOrEqual(2);
     unsubscribe();
     listener.mockClear();
-    setApiKey('again');
+    setCheckpoint(checkpoint);
     expect(listener).not.toHaveBeenCalled();
   });
 });

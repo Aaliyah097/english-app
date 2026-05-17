@@ -2,12 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userProfileSchema } from '../../schemas';
-import {
-  exportAll,
-  getApiKey,
-  getUserProfile,
-  setUserProfile,
-} from '../../storage';
+import { exportAll, getUserProfile, setUserProfile } from '../../storage';
 import type { UserProfile } from '../../types';
 import { SettingsScreen } from './SettingsScreen';
 
@@ -29,27 +24,6 @@ describe('SettingsScreen', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-  });
-
-  it('saves a typed API key via storage', async () => {
-    const user = userEvent.setup();
-    render(<SettingsScreen />);
-    const input = screen.getByLabelText('API key');
-    await user.type(input, '  sk-test-abcd1234  ');
-    await user.click(screen.getByRole('button', { name: 'Save' }));
-    expect(getApiKey()).toBe('sk-test-abcd1234');
-  });
-
-  it('clears the API key after confirming', async () => {
-    const user = userEvent.setup();
-    render(<SettingsScreen />);
-    // Seed via the panel itself.
-    await user.type(screen.getByLabelText('API key'), 'sk-zzzz');
-    await user.click(screen.getByRole('button', { name: 'Save' }));
-    expect(getApiKey()).toBe('sk-zzzz');
-
-    await user.click(screen.getByRole('button', { name: /clear key/i }));
-    expect(getApiKey()).toBeNull();
   });
 
   it('toggles an interest chip and persists it to the profile', async () => {

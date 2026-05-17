@@ -42,8 +42,9 @@ Implement the canonical practice loop: AI shows a rule + sentence → user types
    - Build `TutorTurnInput` from current profile + checkpoint + current exercise + answer. (No vocabulary summary — that field does not exist in v1's `TutorTurnInput`.)
    - Call `requestTutorTurn`. Handle each tagged-union branch:
      - `ok` → `phase = 'review'`, persist via `mergeCheckpoint(response.updatedCheckpoint)`, save `response.nextExercise` to local state.
-     - `no-key` → `phase = 'error'`, render an inline notice with a CTA "Add your API key in Settings".
      - `network-error` / `invalid-response` → `phase = 'error'`, render the error message + a Retry button.
+
+(No `'no-key'` branch — the key lives on the Vercel function, not in the browser. Network failures hitting `/api/tutor` surface as `network-error` and the user can retry.)
 5. "Next" CTA (in review phase): set `currentExercise = lastResult.nextExercise`, clear `userAnswer`, set `phase = 'input'`.
 6. The cog icon in TopicBar opens Settings (uses S05's screen-change callback — pass it in as a prop).
 7. Tests in `src/screens/practice/PracticeScreen.test.tsx`:

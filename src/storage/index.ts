@@ -108,23 +108,6 @@ export function mergeCheckpoint(
   return validated;
 }
 
-// ── BYOK API key ───────────────────────────────────────────────────────────
-
-const apiKeySchema = z.string().min(1);
-
-export function getApiKey(): string | null {
-  return readJson(STORAGE_KEYS.apiKey, apiKeySchema);
-}
-
-export function setApiKey(key: string | null): void {
-  if (key == null || key.trim() === '') {
-    localStorage.removeItem(STORAGE_KEYS.apiKey);
-  } else {
-    writeJson(STORAGE_KEYS.apiKey, key.trim());
-  }
-  notify();
-}
-
 // ── export / import / reset ────────────────────────────────────────────────
 
 const exportEnvelopeSchema = z.object({
@@ -134,8 +117,6 @@ const exportEnvelopeSchema = z.object({
 });
 
 export function exportAll(): string {
-  // The API key is intentionally excluded — it never leaves the device,
-  // even via export.
   const envelope = {
     schemaVersion: SCHEMA_VERSION,
     profile: getUserProfile(),
@@ -169,8 +150,8 @@ export function importAll(json: string): void {
 }
 
 /**
- * Wipes everything this app owns — including the API key. The Settings
- * screen wraps this with a confirmation dialog (see story S11).
+ * Wipes everything this app owns (profile, checkpoint). The Settings screen
+ * wraps this with a confirmation dialog (see story S11).
  */
 export function resetAll(): void {
   const toRemove: string[] = [];

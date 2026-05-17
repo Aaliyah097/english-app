@@ -1,20 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import OpenAI from 'openai';
 import type { Exercise, LearningCheckpoint, UserProfile } from '../types';
-import { setApiKey } from '../storage';
-import { __resetAiClientCache, DEFAULT_MODEL, PROVIDER_BASE_URL } from './client';
-import { requestTutorTurn } from './index';
-
-vi.mock('openai');
-
-const MockedOpenAI = vi.mocked(OpenAI);
-const create = vi.fn();
-MockedOpenAI.mockImplementation(
-  () =>
-    ({
-      chat: { completions: { create } },
-    }) as unknown as OpenAI,
-);
+import { PROXY_URL, requestTutorTurn } from './index';
 
 const profile: UserProfile = {
   nativeLanguage: 'ru',
@@ -39,7 +25,6 @@ const exercise: Exercise = {
   grammarTopic: 'Present Simple',
   difficulty: 1,
 };
-
 const input = {
   userProfile: profile,
   checkpoint,
@@ -47,7 +32,7 @@ const input = {
   userAnswer: 'I work.',
 };
 
-const goodPayload = JSON.stringify({
+const validPayload = {
   messageToUser: 'Looks good.',
   correctedAnswer: 'I work.',
   updatedCheckpoint: {},
@@ -58,55 +43,48 @@ const goodPayload = JSON.stringify({
     grammarTopic: 'Present Simple',
     difficulty: 1,
   },
-});
+};
+
+const originalFetch = globalThis.fetch;
 
 beforeEach(() => {
-  localStorage.clear();
-  __resetAiClientCache();
-  MockedOpenAI.mockClear();
-  create.mockReset();
+  // Each test installs its own fetch mock.
+  globalThis.fetch = vi.fn();
 });
 
 afterEach(() => {
-  localStorage.clear();
-  __resetAiClientCache();
+  globalThis.fetch = originalFetch;
 });
 
+function mockFetchOnce(response: { status?: number; body: unknown }) {
+  (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+    new Response(JSON.stringify(response.body), {
+      status: response.status ?? 200,
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  );
+}
+
 describe('requestTutorTurn', () => {
-  it('returns {kind:"no-key"} when no api key is stored', async () => {
-    const result = await requestTutorTurn(input);
-    expect(result.kind).toBe('no-key');
-    expect(MockedOpenAI).not.toHaveBeenCalled();
-  });
-
-  it('instantiates OpenAI with the DeepSeek base URL and dangerouslyAllowBrowser', async () => {
-    setApiKey('sk-test');
-    create.mockResolvedValueOnce({ choices: [{ message: { content: goodPayload } }] });
+  it('POSTs to /api/tutor with the input as JSON', async () => {
+    mockFetchOnce({ body: validPayload });
     await requestTutorTurn(input);
-    expect(MockedOpenAI).toHaveBeenCalledWith(
+    const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+    expect(fetchMock).toHaveBeenCalledWith(
+      PROXY_URL,
       expect.objectContaining({
-        apiKey: 'sk-test',
-        baseURL: PROVIDER_BASE_URL,
-        dangerouslyAllowBrowser: true,
+        method: 'POST',
+        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
       }),
     );
-  });
-
-  it('calls chat.completions.create with the DeepSeek model and JSON mode', async () => {
-    setApiKey('sk-test');
-    create.mockResolvedValueOnce({ choices: [{ message: { content: goodPayload } }] });
-    await requestTutorTurn(input);
-    expect(create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        model: DEFAULT_MODEL,
-        response_format: { type: 'json_object' },
-      }),
-    );
+    const firstCall = fetchMock.mock.calls[0];
+    expect(firstCall).toBeDefined();
+    const sent = JSON.parse(firstCall![1].body as string);
+    expect(sent.userAnswer).toBe('I work.');
   });
 
   it('returns {kind:"ok", response} on a valid payload', async () => {
-    setApiKey('sk-test');
-    create.mockResolvedValueOnce({ choices: [{ message: { content: goodPayload } }] });
+    mockFetchOnce({ body: validPayload });
     const result = await requestTutorTurn(input);
     expect(result.kind).toBe('ok');
     if (result.kind === 'ok') {
@@ -114,23 +92,29 @@ describe('requestTutorTurn', () => {
     }
   });
 
-  it('returns {kind:"network-error"} when the SDK throws', async () => {
-    setApiKey('sk-test');
-    create.mockRejectedValueOnce(new Error('connection refused'));
+  it('returns {kind:"network-error"} when fetch throws', async () => {
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error('Failed to fetch'),
+    );
     const result = await requestTutorTurn(input);
     expect(result.kind).toBe('network-error');
     if (result.kind === 'network-error') {
-      expect(result.message).toMatch(/connection refused/);
+      expect(result.message).toMatch(/Failed to fetch/);
     }
   });
 
-  it('returns {kind:"invalid-response"} on a malformed payload', async () => {
-    setApiKey('sk-test');
-    create.mockResolvedValueOnce({ choices: [{ message: { content: 'definitely not json' } }] });
+  it('returns {kind:"network-error"} when the server responds non-2xx', async () => {
+    mockFetchOnce({ status: 500, body: { error: 'Upstream broken' } });
+    const result = await requestTutorTurn(input);
+    expect(result.kind).toBe('network-error');
+    if (result.kind === 'network-error') {
+      expect(result.message).toMatch(/Upstream broken/);
+    }
+  });
+
+  it('returns {kind:"invalid-response"} when the payload does not match the schema', async () => {
+    mockFetchOnce({ body: { messageToUser: 'hi' } });
     const result = await requestTutorTurn(input);
     expect(result.kind).toBe('invalid-response');
-    if (result.kind === 'invalid-response') {
-      expect(result.message).toMatch(/JSON|schema/);
-    }
   });
 });

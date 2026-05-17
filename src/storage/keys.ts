@@ -8,7 +8,6 @@ const NS = `englishly:v${SCHEMA_VERSION}` as const;
 export const STORAGE_KEYS = {
   profile: `${NS}:profile`,
   checkpoint: `${NS}:checkpoint`,
-  apiKey: `${NS}:apiKey`,
 } as const;
 
 // Prefix used by resetAll() to wipe everything we own.

@@ -137,18 +137,18 @@ describe('PracticeScreen', () => {
     expect(mockedRequest).toHaveBeenCalledTimes(2);
   });
 
-  it('renders an API-key notice when requestTutorTurn returns no-key', async () => {
-    mockedRequest.mockResolvedValueOnce({ kind: 'no-key' });
-    const onMenu = vi.fn();
+  it('renders a retry-able error when the server responds with a network error', async () => {
+    mockedRequest.mockResolvedValueOnce({
+      kind: 'network-error',
+      message: 'Upstream broken',
+    });
 
-    render(<PracticeScreen onMenu={onMenu} />);
+    render(<PracticeScreen />);
 
     await waitFor(() =>
-      expect(screen.getByText(/api key in settings/i)).toBeInTheDocument(),
+      expect(screen.getByText(/upstream broken/i)).toBeInTheDocument(),
     );
-
-    await userEvent.click(screen.getByRole('button', { name: /open settings/i }));
-    expect(onMenu).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
   });
 
   it('next after review clears input and uses the new exercise as source', async () => {
