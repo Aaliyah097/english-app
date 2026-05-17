@@ -59,9 +59,10 @@ describe('App', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /progress/i }));
 
-    expect(screen.getByTestId('screen-placeholder')).toHaveAttribute(
-      'data-screen',
-      'Progress',
-    );
+    // S10 replaced the Progress placeholder with the real screen — its empty
+    // state copy is the smallest stable signal that we routed there.
+    expect(
+      screen.getByText(/start practising to see your progress/i),
+    ).toBeInTheDocument();
   });
 });

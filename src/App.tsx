@@ -1,4 +1,4 @@
-import { useState, type ComponentType } from 'react';
+import { useState } from 'react';
 import { BottomNav, type ScreenId } from './ui';
 import {
   OnboardingScreen,
@@ -8,12 +8,6 @@ import {
 } from './screens';
 import { getUserProfile } from './storage';
 import { useStorageSnapshot } from './storage/useStorageSnapshot';
-
-const SCREENS: Record<ScreenId, ComponentType> = {
-  practice: PracticeScreen,
-  progress: ProgressScreen,
-  settings: SettingsScreen,
-};
 
 // useStorageSnapshot is backed by useSyncExternalStore, which requires the
 // selector to return a stable reference between renders unless the data has
@@ -33,11 +27,13 @@ export function App() {
     return <OnboardingScreen onComplete={() => {}} />;
   }
 
-  const ActiveScreen = SCREENS[active];
-
   return (
     <>
-      <ActiveScreen />
+      {active === 'practice' && <PracticeScreen />}
+      {active === 'progress' && (
+        <ProgressScreen onGoToPractice={() => setActive('practice')} />
+      )}
+      {active === 'settings' && <SettingsScreen />}
       <BottomNav active={active} onChange={setActive} />
     </>
   );
