@@ -56,7 +56,18 @@ export function getUserProfile(): UserProfile | null {
 }
 
 export function setUserProfile(p: UserProfile): void {
-  writeJson(STORAGE_KEYS.profile, userProfileSchema.parse(p));
+  const validated = userProfileSchema.parse(p);
+  writeJson(STORAGE_KEYS.profile, validated);
+  // The checkpoint stores a denormalised copy of the profile so the AI
+  // prompt sees a self-contained snapshot. Keep it in sync — otherwise
+  // the AI receives stale languages/interests after a profile edit.
+  const checkpoint = getCheckpoint();
+  if (checkpoint) {
+    writeJson(STORAGE_KEYS.checkpoint, {
+      ...checkpoint,
+      userProfile: validated,
+    });
+  }
   notify();
 }
 

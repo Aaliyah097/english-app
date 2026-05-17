@@ -103,6 +103,21 @@ describe('storage — checkpoint', () => {
     expect(() => mergeCheckpoint({})).toThrow();
   });
 
+  it('setUserProfile syncs the checkpoint.userProfile nested copy', () => {
+    setCheckpoint(checkpoint);
+    const updated: UserProfile = { ...profile, targetLanguage: 'es' };
+    setUserProfile(updated);
+    const stored = getCheckpoint();
+    expect(stored?.userProfile.targetLanguage).toBe('es');
+    // Other checkpoint fields are untouched.
+    expect(stored?.currentLearningFocus.grammarTopic).toBe('Present Simple');
+  });
+
+  it('setUserProfile is a no-op on the checkpoint when none exists', () => {
+    setUserProfile(profile);
+    expect(getCheckpoint()).toBeNull();
+  });
+
   it('mergeCheckpoint preserves mistakesByCategory across AI patches', () => {
     setCheckpoint({ ...checkpoint, mistakesByCategory: { articles: 3 } });
     const merged = mergeCheckpoint({
