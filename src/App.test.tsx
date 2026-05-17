@@ -25,16 +25,15 @@ afterEach(() => {
 describe('App', () => {
   it('renders the onboarding screen when no profile is stored', () => {
     render(<App />);
-    const placeholder = screen.getByTestId('screen-placeholder');
-    expect(placeholder).toHaveAttribute('data-screen', 'Onboarding');
+    // S06's StepWelcome shows the "Begin" CTA — assert on that as the
+    // smallest stable indicator that we're in the onboarding flow.
+    expect(screen.getByRole('button', { name: /begin/i })).toBeInTheDocument();
+    expect(screen.queryByTestId('screen-placeholder')).not.toBeInTheDocument();
   });
 
   it('renders the practice screen once a profile exists', () => {
     render(<App />);
-    expect(screen.getByTestId('screen-placeholder')).toHaveAttribute(
-      'data-screen',
-      'Onboarding',
-    );
+    expect(screen.getByRole('button', { name: /begin/i })).toBeInTheDocument();
 
     // Writing a profile notifies subscribers — App should re-render into the
     // main shell with Practice as the default tab.
