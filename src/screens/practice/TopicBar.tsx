@@ -1,5 +1,5 @@
 import { theme as T } from '../../theme';
-import { Chip, Icon } from '../../ui';
+import { Icon } from '../../ui';
 import type { LearningCheckpoint } from '../../types';
 
 type Props = {
@@ -7,14 +7,13 @@ type Props = {
   onMenu?: (() => void) | undefined;
 };
 
-// Top bar showing the current grammar topic + a lifetime "patterns flagged"
-// chip + a cog that opens Settings. The mockup's exercise-index pill and the
-// X/Y progress bar were removed because the practice loop is intentionally
-// endless — see BACKLOG. The counter is the user's honest progress signal:
-// the slope flattens as they improve.
+// Top bar showing the current grammar topic + a cog that opens Settings.
+// No counters or progress bars — practice is intentionally endless and the
+// user stops when they feel ready. Mistake categories are still tracked in
+// the background (LearningCheckpoint.mistakesByCategory) so the AI can use
+// them to weight future exercises toward the user's weak spots.
 export function TopicBar({ checkpoint, onMenu }: Props) {
   const topic = checkpoint.currentLearningFocus.grammarTopic;
-  const flagged = sumCounts(checkpoint.mistakesByCategory);
 
   return (
     <div
@@ -42,38 +41,24 @@ export function TopicBar({ checkpoint, onMenu }: Props) {
         <div style={{ fontSize: 13, fontWeight: 500 }}>{topic}</div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: T.ink2 }}>
-        <Chip tone="neutral" size="sm">
-          <Icon.Flame s={12} />
-          <span>
-            {flagged} {flagged === 1 ? 'flag' : 'flags'}
-          </span>
-        </Chip>
-        <button
-          type="button"
-          aria-label="Settings"
-          onClick={onMenu}
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 999,
-            background: T.surface,
-            border: `0.5px solid ${T.border}`,
-            color: T.ink2,
-            cursor: 'pointer',
-            display: 'grid',
-            placeItems: 'center',
-          }}
-        >
-          <Icon.Cog s={15} />
-        </button>
-      </div>
+      <button
+        type="button"
+        aria-label="Settings"
+        onClick={onMenu}
+        style={{
+          width: 30,
+          height: 30,
+          borderRadius: 999,
+          background: T.surface,
+          border: `0.5px solid ${T.border}`,
+          color: T.ink2,
+          cursor: 'pointer',
+          display: 'grid',
+          placeItems: 'center',
+        }}
+      >
+        <Icon.Cog s={15} />
+      </button>
     </div>
   );
-}
-
-function sumCounts(record: Record<string, number>): number {
-  let n = 0;
-  for (const v of Object.values(record)) n += v;
-  return n;
 }
