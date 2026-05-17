@@ -45,7 +45,11 @@ export type ErrorCategory = z.infer<typeof errorCategorySchema>;
 
 export const mistakeSchema = z.object({
   type: z.string().min(1),
-  category: errorCategorySchema,
+  // `category` should always be set by the AI per the prompt, but defaulting
+  // to 'other' keeps us resilient: (a) old stored mistakes from before this
+  // field was added still parse, (b) if the model slips and omits it for a
+  // new mistake we accept the response rather than 502ing.
+  category: errorCategorySchema.default('other'),
   example: z.string(),
   correction: z.string(),
   explanation: z.string().optional(),
