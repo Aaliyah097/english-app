@@ -1,21 +1,38 @@
+import { lazy, Suspense } from 'react';
+import { theme as T } from './theme';
+
+// Dev-only playground. In prod builds, the if-branch is dead code and Vite
+// tree-shakes the dynamic import away, so the playground bundle never ships.
+const Playground = import.meta.env.DEV ? lazy(() => import('./ui/__playground').then((m) => ({ default: m.Playground }))) : null;
+
 export function App() {
+  if (Playground) {
+    return (
+      <Suspense fallback={<Wordmark />}>
+        <Playground />
+      </Suspense>
+    );
+  }
+  return <Wordmark />;
+}
+
+function Wordmark() {
   return (
     <div
       style={{
         position: 'absolute',
         inset: 0,
-        background: '#faf9f6',
-        color: '#1a1a1a',
+        background: T.bg,
+        color: T.ink,
         display: 'grid',
         placeItems: 'center',
-        fontFamily:
-          '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+        fontFamily: T.fontBody,
       }}
     >
       <div style={{ textAlign: 'center' }}>
         <div
           style={{
-            fontFamily: '"Newsreader", "Iowan Old Style", Georgia, serif',
+            fontFamily: T.fontDisplay,
             fontStyle: 'italic',
             fontSize: 42,
             letterSpacing: -0.8,
@@ -26,9 +43,9 @@ export function App() {
         </div>
         <div
           style={{
-            fontFamily: '"Geist Mono", ui-monospace, monospace',
+            fontFamily: T.fontMono,
             fontSize: 11,
-            color: '#8a857a',
+            color: T.muted,
             letterSpacing: 1.4,
             textTransform: 'uppercase',
           }}
