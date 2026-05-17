@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  learningCheckpointSchema,
+  mistakeSchema,
   partialLearningCheckpointSchema,
   tutorResponseSchema,
   userProfileSchema,
-  learningCheckpointSchema,
 } from './schemas';
 import type { TutorResponse, UserProfile, LearningCheckpoint } from './types';
 
@@ -109,6 +110,55 @@ describe('schemas', () => {
       ...validResponse,
       nextExercise: { ...validResponse.nextExercise, difficulty: 99 },
     };
+    expect(tutorResponseSchema.safeParse(bad).success).toBe(false);
+  });
+
+  // ── Security: length caps + closed-set enforcement ────────────────────────
+
+  it('userProfileSchema rejects an unknown goal id', () => {
+    const bad = { ...validProfile, goal: 'pirate-mode' };
+    expect(userProfileSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('userProfileSchema rejects an oversized interest string', () => {
+    const bad = { ...validProfile, interests: ['x'.repeat(100)] };
+    expect(userProfileSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('userProfileSchema rejects more than 20 interests', () => {
+    const bad = {
+      ...validProfile,
+      interests: Array.from({ length: 21 }, (_, i) => `int-${i}`),
+    };
+    expect(userProfileSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('mistakeSchema rejects an oversized explanation', () => {
+    const bad = {
+      type: 'Articles',
+      category: 'articles' as const,
+      example: 'a',
+      correction: 'an',
+      explanation: 'x'.repeat(600),
+    };
+    expect(mistakeSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('learningCheckpointSchema rejects more than 30 recentMistakes', () => {
+    const bad = {
+      ...validCheckpoint,
+      recentMistakes: Array.from({ length: 31 }, () => ({
+        type: 't',
+        category: 'other' as const,
+        example: 'e',
+        correction: 'c',
+      })),
+    };
+    expect(learningCheckpointSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('tutorResponseSchema rejects an oversized messageToUser', () => {
+    const bad = { ...validResponse, messageToUser: 'x'.repeat(1100) };
     expect(tutorResponseSchema.safeParse(bad).success).toBe(false);
   });
 });

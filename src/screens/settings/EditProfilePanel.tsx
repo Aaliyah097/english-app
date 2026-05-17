@@ -8,6 +8,9 @@ import {
 } from '../../storage';
 import { theme as T } from '../../theme';
 import type { Level, UserProfile } from '../../types';
+import type { goalIdSchema } from '../../schemas';
+import type { z } from 'zod';
+type GoalId = z.infer<typeof goalIdSchema>;
 import { Icon } from '../../ui';
 import { t } from '../../i18n';
 import { useLocale } from '../../i18n/useLocale';
@@ -84,7 +87,7 @@ export function EditProfilePanel() {
     }
   };
   const setLevel = (level: Level) => updateProfile({ level });
-  const setGoal = (goal: string) => updateProfile({ goal });
+  const setGoal = (goal: GoalId) => updateProfile({ goal });
 
   return (
     <PanelCard>
