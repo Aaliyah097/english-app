@@ -11,6 +11,10 @@ import type { Exercise, LearningCheckpoint, TutorResponse, UserProfile } from '.
 
 export const PROXY_URL = '/api/tutor';
 
+// A tutor turn is normally back in 3-8s; 30s leaves room for DeepSeek hiccups
+// without leaving the user staring at a "Checking…" placeholder forever.
+const TUTOR_TIMEOUT_MS = 30_000;
+
 export type TutorTurnInput = {
   userProfile: UserProfile;
   checkpoint: LearningCheckpoint;
@@ -26,15 +30,27 @@ export type TutorTurnResult =
 export async function requestTutorTurn(
   input: TutorTurnInput,
 ): Promise<TutorTurnResult> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TUTOR_TIMEOUT_MS);
+
   let res: Response;
   try {
     res = await fetch(PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input),
+      signal: controller.signal,
     });
   } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      return {
+        kind: 'network-error',
+        message: `Request timed out after ${TUTOR_TIMEOUT_MS / 1000}s. Try again.`,
+      };
+    }
     return { kind: 'network-error', message: (err as Error).message };
+  } finally {
+    clearTimeout(timeoutId);
   }
 
   let body: unknown;

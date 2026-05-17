@@ -117,4 +117,15 @@ describe('requestTutorTurn', () => {
     const result = await requestTutorTurn(input);
     expect(result.kind).toBe('invalid-response');
   });
+
+  it('returns {kind:"network-error"} with a timeout message when the abort fires', async () => {
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new DOMException('Aborted', 'AbortError'),
+    );
+    const result = await requestTutorTurn(input);
+    expect(result.kind).toBe('network-error');
+    if (result.kind === 'network-error') {
+      expect(result.message).toMatch(/timed out/i);
+    }
+  });
 });
