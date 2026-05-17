@@ -11,9 +11,9 @@ import type { Exercise, LearningCheckpoint, TutorResponse, UserProfile } from '.
 
 export const PROXY_URL = '/api/tutor';
 
-// A tutor turn is normally back in 3-8s; 30s leaves room for DeepSeek hiccups
-// without leaving the user staring at a "Checking…" placeholder forever.
-const TUTOR_TIMEOUT_MS = 30_000;
+// A tutor turn is normally back in 3-8s; 10s is short enough that "something's
+// wrong" is obvious without giving up on a slightly-slow-but-fine call.
+const TUTOR_TIMEOUT_MS = 10_000;
 
 export type TutorTurnInput = {
   userProfile: UserProfile;
