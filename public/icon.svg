@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Warm off-white square with rounded corners matches the in-app surface
+       palette. Browsers that mask the icon (e.g. Android adaptive icons) get
+       enough safe area around the wordmark. -->
+  <rect width="512" height="512" rx="96" fill="#faf9f6"/>
+  <text
+    x="256"
+    y="370"
+    font-family="'Newsreader', 'Iowan Old Style', Georgia, serif"
+    font-style="italic"
+    font-weight="500"
+    font-size="360"
+    text-anchor="middle"
+    fill="#1a1a1a"
+  >E</text>
+</svg>
