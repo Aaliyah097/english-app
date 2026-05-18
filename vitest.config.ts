@@ -1,21 +1,17 @@
-import { defineConfig, mergeConfig } from 'vitest/config';
-import viteConfig from './vite.config';
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
 
-export default mergeConfig(
-  viteConfig,
-  defineConfig({
-    test: {
-      environment: 'jsdom',
-      globals: true,
-      setupFiles: ['./src/test/setup.ts'],
-      css: false,
-      // Worktrees used for parallel sub-agent work live under .claude/worktrees;
-      // they each contain a full copy of src/ which would otherwise be scanned.
-      exclude: [
-        '**/node_modules/**',
-        '**/dist/**',
-        '.claude/**',
-      ],
-    },
-  }),
-);
+// Standalone vitest config — no longer extends vite.config (the project
+// uses Next.js for build/dev; vitest still uses Vite internally for test
+// transforms, hence the React plugin).
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.ts'],
+    css: false,
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.next/**', '.claude/**'],
+  },
+});

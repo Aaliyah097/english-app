@@ -25,3 +25,5 @@ docs
 *.swp
 *.swo
 *~
+
+.next

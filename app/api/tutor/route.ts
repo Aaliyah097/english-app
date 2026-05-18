@@ -1,4 +1,4 @@
-// Vercel serverless function: holds the DeepSeek API key server-side so it
+// Next.js Route Handler. Holds the DeepSeek API key server-side so it
 // never ships in the browser bundle. The frontend POSTs a structured tutor
 // turn input here; we build the prompt, call DeepSeek, validate the JSON
 // against the same Zod schema the client uses, and forward the result.
@@ -8,6 +8,7 @@
 //   DEEPSEEK_MODEL     — optional; defaults to 'deepseek-chat'
 //   DEEPSEEK_BASE_URL  — optional; defaults to 'https://api.deepseek.com/v1'
 
+import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
 import {
@@ -15,13 +16,10 @@ import {
   learningCheckpointSchema,
   tutorResponseSchema,
   userProfileSchema,
-} from '../src/schemas.js';
+} from '../../../src/schemas';
 
-// Configure this function inline (Vercel reads `export const config`).
-// maxDuration must accommodate the worst-case DeepSeek response time.
-export const config = {
-  maxDuration: 60,
-};
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 const requestSchema = z.object({
   userProfile: userProfileSchema,
@@ -143,72 +141,55 @@ function firstJsonBlock(raw: string): string {
   return raw.slice(start, end + 1);
 }
 
-export default async function handler(req: Request): Promise<Response> {
-  if (req.method !== 'POST') {
-    return json({ error: 'Method not allowed' }, 405);
-  }
-
+export async function POST(req: Request) {
   const key = process.env.DEEPSEEK_API_KEY;
   if (!key) {
-    return json({ error: 'Server misconfigured: DEEPSEEK_API_KEY not set' }, 500);
+    return NextResponse.json(
+      { error: 'Server misconfigured: DEEPSEEK_API_KEY not set' },
+      { status: 500 },
+    );
   }
 
   let body: unknown;
   try {
     body = await req.json();
   } catch {
-    return json({ error: 'Body must be valid JSON' }, 400);
+    return NextResponse.json({ error: 'Body must be valid JSON' }, { status: 400 });
   }
 
   const parsed = requestSchema.safeParse(body);
   if (!parsed.success) {
-    return json(
+    return NextResponse.json(
       { error: `Bad request: ${parsed.error.issues[0]?.message ?? 'schema mismatch'}` },
-      400,
+      { status: 400 },
     );
   }
 
   const baseURL = process.env.DEEPSEEK_BASE_URL ?? 'https://api.deepseek.com/v1';
-  // 55s timeout on the SDK call, leaving 5s for our own validation + response
-  // serialisation under the Vercel function's 60s cap.
-  const client = new OpenAI({ apiKey: key, baseURL, timeout: 55_000 });
+  const client = new OpenAI({ apiKey: key, baseURL });
   const model = process.env.DEEPSEEK_MODEL ?? 'deepseek-chat';
-
-  // Diagnostic — these go to Vercel function logs. If the upstream call
-  // hangs at the TCP/TLS layer, the SDK's `timeout` option doesn't fire,
-  // so we wrap with an external AbortController that aborts the fetch
-  // directly. Timestamps tell us whether time is spent before or after the
-  // SDK starts the request.
-  console.log(JSON.stringify({ at: 'before-deepseek', baseURL, model, t: Date.now() }));
-
-  const ac = new AbortController();
-  const abortTimer = setTimeout(() => ac.abort(), 55_000);
 
   let completion;
   try {
-    completion = await client.chat.completions.create(
-      {
-        model,
-        response_format: { type: 'json_object' },
-        temperature: 0.4,
-        // Hard ceiling on response size. At DeepSeek-V3 throughput
-        // (~25-40 tok/s) 600 tokens caps generation around 15-25s. Real
-        // tutor responses rarely exceed 500 tokens; schema validation
-        // would reject anything weirdly truncated anyway.
-        max_tokens: 600,
-        messages: [
-          { role: 'system', content: buildSystemPrompt(parsed.data.userProfile) },
-          { role: 'user', content: buildUserPrompt(parsed.data) },
-        ],
-      },
-      { signal: ac.signal },
-    );
-    console.log(JSON.stringify({ at: 'after-deepseek', t: Date.now() }));
+    completion = await client.chat.completions.create({
+      model,
+      response_format: { type: 'json_object' },
+      temperature: 0.4,
+      // Hard ceiling on response size. At DeepSeek-V3 throughput
+      // (~25-40 tok/s) 600 tokens caps generation around 15-25s. Real
+      // tutor responses rarely exceed 500 tokens; schema validation
+      // would reject anything weirdly truncated anyway.
+      max_tokens: 600,
+      messages: [
+        { role: 'system', content: buildSystemPrompt(parsed.data.userProfile) },
+        { role: 'user', content: buildUserPrompt(parsed.data) },
+      ],
+    });
   } catch (err) {
-    console.error(JSON.stringify({ at: 'deepseek-error', message: (err as Error).message, t: Date.now() }));
-    return json({ error: `Upstream error: ${(err as Error).message}` }, 502);
-  } finally {
-    clearTimeout(abortTimer);
+    return NextResponse.json(
+      { error: `Upstream error: ${(err as Error).message}` },
+      { status: 502 },
+    );
   }
 
   const raw = completion.choices[0]?.message?.content ?? '';
@@ -216,29 +197,22 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     aiObj = JSON.parse(firstJsonBlock(stripFences(raw)));
   } catch (err) {
-    return json(
+    return NextResponse.json(
       { error: `Upstream returned non-JSON: ${(err as Error).message}`, raw },
-      502,
+      { status: 502 },
     );
   }
 
   const validated = tutorResponseSchema.safeParse(aiObj);
   if (!validated.success) {
-    return json(
+    return NextResponse.json(
       {
         error: `Upstream JSON did not match schema (${validated.error.issues[0]?.path.join('.') ?? '?'}: ${validated.error.issues[0]?.message ?? '?'})`,
         raw,
       },
-      502,
+      { status: 502 },
     );
   }
 
-  return json(validated.data, 200);
-}
-
-function json(body: unknown, status: number): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return NextResponse.json(validated.data, { status: 200 });
 }
