@@ -1,29 +1,35 @@
+# Local-only directories
 /ai
 /.claude
+docs
+
+# Dependencies
 node_modules
-dist
-.vite
+
+# Build output (Next.js)
+.next
+/out
+
+# Test / build caches
 coverage
-.DS_Store
-Thumbs.db
-*.log
 *.tsbuildinfo
 .eslintcache
 
-# All dotenv files are ignored — secrets must never be committed. The one
-# exception is .env.example, which IS tracked as a template for new clones.
-.env
-.env.*
-!.env.example
-
-docs
-.vercel
-
-# IDE / editor state
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.log
 /.idea
 /.vscode
 *.swp
 *.swo
 *~
 
-.next
+# Vercel CLI state
+.vercel
+
+# All dotenv files are ignored — secrets must never be committed. The one
+# exception is .env.example, which IS tracked as a template for new clones.
+.env
+.env.*
+!.env.example
