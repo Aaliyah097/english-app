@@ -2,7 +2,6 @@
 // the two surfaces never drift. Keep behaviour identical to S06.
 
 import type { StringKey } from '../../i18n/strings';
-import type { Level } from '../../types';
 
 // v1 assumes all users are native Russian speakers — no native-language picker.
 // The native code is hardcoded as 'ru' wherever we need it.
@@ -21,40 +20,15 @@ export const TARGET_LANGUAGES: ReadonlyArray<{ code: string; name: string; en: s
 // Interest IDs are stored canonical (English label) on the profile and sent
 // to the AI as-is. The displayed label is resolved via i18n at render time.
 export const ALL_INTERESTS: ReadonlyArray<{ id: string; labelKey: StringKey }> = [
-  { id: 'Software dev', labelKey: 'interest.softwareDev' },
-  { id: 'Architecture', labelKey: 'interest.architecture' },
-  { id: 'DevOps', labelKey: 'interest.devops' },
+  { id: 'Software development', labelKey: 'interest.softwareDev' },
+  { id: 'Software architecture', labelKey: 'interest.architecture' },
+  { id: 'DevOps / SRE', labelKey: 'interest.devops' },
   { id: 'Data', labelKey: 'interest.data' },
-  { id: 'Business', labelKey: 'interest.business' },
-  { id: 'Design', labelKey: 'interest.design' },
-  { id: 'Marketing', labelKey: 'interest.marketing' },
-  { id: 'Finance', labelKey: 'interest.finance' },
-  { id: 'Medicine', labelKey: 'interest.medicine' },
-  { id: 'Gaming', labelKey: 'interest.gaming' },
-  { id: 'Travel', labelKey: 'interest.travel' },
-  { id: 'Music', labelKey: 'interest.music' },
-  { id: 'Management', labelKey: 'interest.management' },
-  { id: 'Psychology', labelKey: 'interest.psychology' },
-  { id: 'Education', labelKey: 'interest.education' },
+  { id: 'Product management', labelKey: 'interest.productMgmt' },
+  { id: 'Product design', labelKey: 'interest.design' },
+  { id: 'QA / testing', labelKey: 'interest.qa' },
+  { id: 'Cybersecurity', labelKey: 'interest.cybersecurity' },
+  { id: 'Engineering management', labelKey: 'interest.engMgmt' },
   { id: 'Everyday life', labelKey: 'interest.everydayLife' },
-];
-
-export const LEVELS: ReadonlyArray<{ id: Level; nameKey: StringKey; blurbKey: StringKey }> = [
-  { id: 'beginner', nameKey: 'level.beginner.name', blurbKey: 'level.beginner.blurb' },
-  {
-    id: 'beginner_intermediate',
-    nameKey: 'level.beginnerIntermediate.name',
-    blurbKey: 'level.beginnerIntermediate.blurb',
-  },
-  {
-    id: 'intermediate',
-    nameKey: 'level.intermediate.name',
-    blurbKey: 'level.intermediate.blurb',
-  },
-  {
-    id: 'upper_intermediate',
-    nameKey: 'level.upperIntermediate.name',
-    blurbKey: 'level.upperIntermediate.blurb',
-  },
 ];
 

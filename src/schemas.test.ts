@@ -11,14 +11,13 @@ import type { TutorResponse, UserProfile, LearningCheckpoint } from './types';
 const validProfile: UserProfile = {
   nativeLanguage: 'ru',
   targetLanguage: 'en',
-  level: 'intermediate',
   interests: ['software development'],
   preferredPracticeMode: 'translation',
 };
 
 const validCheckpoint: LearningCheckpoint = {
   userProfile: validProfile,
-  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
+  currentLearningFocus: { grammarTopic: 'Present Simple', rule: '' },
 };
 
 const validResponse: TutorResponse = {
@@ -33,25 +32,19 @@ const validResponse: TutorResponse = {
   ],
   correctedAnswer: 'This service reads messages from Kafka.',
   updatedCheckpoint: {
-    currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
+    currentLearningFocus: { grammarTopic: 'Present Simple', rule: '' },
   },
   nextExercise: {
     sourceLanguage: 'ru',
     targetLanguage: 'en',
     sentence: 'Этот сервис сохраняет события в базе данных.',
     grammarTopic: 'Present Simple',
-    difficulty: 2,
   },
 };
 
 describe('schemas', () => {
   it('userProfileSchema accepts a valid profile', () => {
     expect(userProfileSchema.parse(validProfile)).toEqual(validProfile);
-  });
-
-  it('userProfileSchema rejects an unknown level', () => {
-    const bad = { ...validProfile, level: 'expert' };
-    expect(userProfileSchema.safeParse(bad).success).toBe(false);
   });
 
   it('learningCheckpointSchema accepts a valid checkpoint', () => {
@@ -64,7 +57,7 @@ describe('schemas', () => {
 
   it('partialLearningCheckpointSchema accepts a partial nested currentLearningFocus', () => {
     // The AI commonly sends only the inner fields that changed (e.g. just
-    // `rule` without re-stating grammarTopic + difficulty). This must parse —
+    // `rule` without re-stating grammarTopic). This must parse —
     // mergeCheckpoint deep-merges before re-validating against the strict
     // schema.
     const partialPatch = {
@@ -83,10 +76,10 @@ describe('schemas', () => {
     expect(result.success).toBe(false);
   });
 
-  it('tutorResponseSchema rejects a difficulty out of bounds', () => {
+  it('tutorResponseSchema rejects an oversized nextExercise.sentence', () => {
     const bad = {
       ...validResponse,
-      nextExercise: { ...validResponse.nextExercise, difficulty: 99 },
+      nextExercise: { ...validResponse.nextExercise, sentence: 'x'.repeat(700) },
     };
     expect(tutorResponseSchema.safeParse(bad).success).toBe(false);
   });

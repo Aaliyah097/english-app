@@ -32,14 +32,13 @@ describe('OnboardingScreen', () => {
     ).toBeInTheDocument();
   });
 
-  it('walks through all four steps and persists a valid profile + checkpoint', async () => {
+  it('walks through all three steps and persists a valid profile + checkpoint', async () => {
     const user = userEvent.setup();
     const onComplete = vi.fn();
     render(<OnboardingScreen onComplete={onComplete} />);
 
-    // Welcome → Begin → Languages → Continue → Level → Continue → Interests → Start.
+    // Welcome → Begin → Languages → Continue → Interests → Start.
     await user.click(screen.getByRole('button', { name: RU('onboarding.button.begin') }));
-    await user.click(screen.getByRole('button', { name: RU('onboarding.button.continue') }));
     await user.click(screen.getByRole('button', { name: RU('onboarding.button.continue') }));
     await user.click(
       screen.getByRole('button', { name: RU('onboarding.button.startPractising') }),

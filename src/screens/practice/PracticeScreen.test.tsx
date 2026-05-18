@@ -24,14 +24,13 @@ const mockedRequest = vi.mocked(requestTutorTurn);
 const profile: UserProfile = {
   nativeLanguage: 'ru',
   targetLanguage: 'en',
-  level: 'intermediate',
   interests: ['software development'],
   preferredPracticeMode: 'translation',
 };
 
 const checkpoint: LearningCheckpoint = {
   userProfile: profile,
-  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
+  currentLearningFocus: { grammarTopic: 'Present Simple', rule: '' },
 };
 
 const firstExercise: Exercise = {
@@ -39,7 +38,6 @@ const firstExercise: Exercise = {
   targetLanguage: 'en',
   sentence: 'Этот сервис читает сообщения.',
   grammarTopic: 'Present Simple',
-  difficulty: 2,
 };
 
 const secondExercise: Exercise = {
@@ -47,7 +45,6 @@ const secondExercise: Exercise = {
   targetLanguage: 'en',
   sentence: 'Эта команда деплоит сервис каждый вторник.',
   grammarTopic: 'Present Simple',
-  difficulty: 2,
 };
 
 function bootstrapResponse(nextExercise: Exercise = firstExercise): TutorResponse {

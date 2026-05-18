@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { learningCheckpointSchema, userProfileSchema } from '../../schemas';
 import { setCheckpoint } from '../../storage';
 import { theme as T } from '../../theme';
-import type { LearningCheckpoint, Level, UserProfile } from '../../types';
+import type { LearningCheckpoint, UserProfile } from '../../types';
 import { Btn, Icon } from '../../ui';
 import { t } from '../../i18n';
 import { useLocale } from '../../i18n/useLocale';
 import { StepInterests } from './StepInterests';
 import { StepLanguages } from './StepLanguages';
-import { StepLevel } from './StepLevel';
 import { StepWelcome } from './StepWelcome';
 import { NATIVE_LANGUAGE_CODE } from './options';
 
@@ -18,17 +17,15 @@ type Props = {
 
 type Draft = {
   targetLanguage: string;
-  level: Level;
   interests: string[];
 };
 
 const DEFAULT_DRAFT: Draft = {
   targetLanguage: 'en',
-  level: 'intermediate',
-  interests: ['Software dev', 'Architecture'],
+  interests: ['Software development', 'Software architecture'],
 };
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 3;
 
 export function OnboardingScreen({ onComplete }: Props) {
   const [step, setStep] = useState(0);
@@ -46,7 +43,6 @@ export function OnboardingScreen({ onComplete }: Props) {
     const profile: UserProfile = userProfileSchema.parse({
       nativeLanguage: NATIVE_LANGUAGE_CODE,
       targetLanguage: draft.targetLanguage,
-      level: draft.level,
       interests: draft.interests,
       preferredPracticeMode: 'translation',
     });
@@ -55,7 +51,6 @@ export function OnboardingScreen({ onComplete }: Props) {
       userProfile: profile,
       currentLearningFocus: {
         grammarTopic: 'Present Simple',
-        difficulty: 2,
         // Leave the rule empty — the AI fills it on the first turn in the
         // user's target language. The default rule (per i18n) is the fallback
         // until then.
@@ -152,12 +147,6 @@ export function OnboardingScreen({ onComplete }: Props) {
           />
         )}
         {step === 2 && (
-          <StepLevel
-            level={draft.level}
-            onChange={(level) => setDraft((d) => ({ ...d, level }))}
-          />
-        )}
-        {step === 3 && (
           <StepInterests selected={draft.interests} onToggle={toggleInterest} />
         )}
       </div>

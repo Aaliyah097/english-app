@@ -39,7 +39,6 @@ const ru = {
   'settings.section.editProfile': 'Профиль',
   'settings.label.learningLanguage': 'Изучаемый язык',
   'settings.label.interests': 'Интересы',
-  'settings.label.level': 'Уровень',
 
   // ── Onboarding ──────────────────────────────────────────────────────────
   'onboarding.button.begin': 'Начать',
@@ -56,44 +55,20 @@ const ru = {
   'onboarding.languages.title': 'Что вы хотите учить?',
   'onboarding.languages.subtitle': 'Это можно поменять позже в настройках.',
 
-  'onboarding.level.title': 'Какой у вас уровень?',
-  'onboarding.level.subtitle':
-    'Будьте честны — это можно изменить в любой момент.',
-
   'onboarding.interests.title': 'Какие темы вам близки?',
   'onboarding.interests.subtitle':
     'На этих темах будут строиться предложения. {count} выбрано.',
 
-  // ── Level names + blurbs ────────────────────────────────────────────────
-  'level.beginner.name': 'Начинающий',
-  'level.beginner.blurb':
-    'Знаю базовые слова и немного Present Simple.',
-  'level.beginnerIntermediate.name': 'Ниже среднего',
-  'level.beginnerIntermediate.blurb':
-    'Могу выразить мысль короткими предложениями.',
-  'level.intermediate.name': 'Средний',
-  'level.intermediate.blurb':
-    'Могу вести короткие беседы с ошибками.',
-  'level.upperIntermediate.name': 'Выше среднего',
-  'level.upperIntermediate.blurb':
-    'Пишу по работе, но хочу звучать естественнее.',
-
   // ── Interests ───────────────────────────────────────────────────────────
-  'interest.softwareDev': 'Разработка',
-  'interest.architecture': 'Архитектура',
-  'interest.devops': 'DevOps',
-  'interest.data': 'Данные',
-  'interest.business': 'Бизнес',
-  'interest.design': 'Дизайн',
-  'interest.marketing': 'Маркетинг',
-  'interest.finance': 'Финансы',
-  'interest.medicine': 'Медицина',
-  'interest.gaming': 'Игры',
-  'interest.travel': 'Путешествия',
-  'interest.music': 'Музыка',
-  'interest.management': 'Менеджмент',
-  'interest.psychology': 'Психология',
-  'interest.education': 'Образование',
+  'interest.softwareDev': 'Разработка ПО',
+  'interest.architecture': 'Архитектура ПО',
+  'interest.devops': 'DevOps / SRE',
+  'interest.data': 'Работа с данными',
+  'interest.productMgmt': 'Продукт-менеджмент',
+  'interest.design': 'Продуктовый дизайн',
+  'interest.qa': 'QA / тестирование',
+  'interest.cybersecurity': 'Информационная безопасность',
+  'interest.engMgmt': 'Управление инженерной командой',
   'interest.everydayLife': 'Повседневная жизнь',
 
   // ── Grammar topic names (canonical IDs are English; this is the label) ──
@@ -166,7 +141,6 @@ const en: Record<keyof typeof ru, string> = {
   'settings.section.editProfile': 'Edit profile',
   'settings.label.learningLanguage': 'Learning language',
   'settings.label.interests': 'Interests',
-  'settings.label.level': 'Level',
 
   'onboarding.button.begin': 'Begin',
   'onboarding.button.continue': 'Continue',
@@ -181,39 +155,19 @@ const en: Record<keyof typeof ru, string> = {
   'onboarding.languages.title': "What do you want\nto learn?",
   'onboarding.languages.subtitle': 'You can change this later in Settings.',
 
-  'onboarding.level.title': 'Where are you\nright now?',
-  'onboarding.level.subtitle': 'Be honest — you can change this any time.',
-
   'onboarding.interests.title': 'Pick a few worlds\nyou know well.',
   'onboarding.interests.subtitle':
     "We'll draw sentences from these. {count} selected.",
 
-  'level.beginner.name': 'Beginner',
-  'level.beginner.blurb': 'I know basic words and some Present Simple.',
-  'level.beginnerIntermediate.name': 'Beginner-Intermediate',
-  'level.beginnerIntermediate.blurb':
-    'I can get my point across in short sentences.',
-  'level.intermediate.name': 'Intermediate',
-  'level.intermediate.blurb': 'I can hold short conversations with mistakes.',
-  'level.upperIntermediate.name': 'Upper-Intermediate',
-  'level.upperIntermediate.blurb':
-    'I write at work but want to sound natural.',
-
-  'interest.softwareDev': 'Software dev',
-  'interest.architecture': 'Architecture',
-  'interest.devops': 'DevOps',
+  'interest.softwareDev': 'Software development',
+  'interest.architecture': 'Software architecture',
+  'interest.devops': 'DevOps / SRE',
   'interest.data': 'Data',
-  'interest.business': 'Business',
-  'interest.design': 'Design',
-  'interest.marketing': 'Marketing',
-  'interest.finance': 'Finance',
-  'interest.medicine': 'Medicine',
-  'interest.gaming': 'Gaming',
-  'interest.travel': 'Travel',
-  'interest.music': 'Music',
-  'interest.management': 'Management',
-  'interest.psychology': 'Psychology',
-  'interest.education': 'Education',
+  'interest.productMgmt': 'Product management',
+  'interest.design': 'Product design',
+  'interest.qa': 'QA / testing',
+  'interest.cybersecurity': 'Cybersecurity',
+  'interest.engMgmt': 'Engineering management',
   'interest.everydayLife': 'Everyday life',
 
   'topic.presentSimple': 'Present Simple',
@@ -283,7 +237,6 @@ const es: Record<keyof typeof ru, string> = {
   'settings.section.editProfile': 'Perfil',
   'settings.label.learningLanguage': 'Idioma que aprendes',
   'settings.label.interests': 'Intereses',
-  'settings.label.level': 'Nivel',
 
   'onboarding.button.begin': 'Empezar',
   'onboarding.button.continue': 'Continuar',
@@ -299,41 +252,19 @@ const es: Record<keyof typeof ru, string> = {
   'onboarding.languages.title': '¿Qué quieres\naprender?',
   'onboarding.languages.subtitle': 'Puedes cambiarlo más tarde en Ajustes.',
 
-  'onboarding.level.title': '¿Dónde estás\nahora?',
-  'onboarding.level.subtitle':
-    'Sé sincero — lo puedes cambiar en cualquier momento.',
-
   'onboarding.interests.title': 'Elige unos mundos\nque conozcas bien.',
   'onboarding.interests.subtitle':
     'Sacaremos frases de estos temas. {count} seleccionados.',
 
-  'level.beginner.name': 'Principiante',
-  'level.beginner.blurb': 'Conozco palabras básicas y algo de presente.',
-  'level.beginnerIntermediate.name': 'Pre-intermedio',
-  'level.beginnerIntermediate.blurb':
-    'Me hago entender en frases cortas.',
-  'level.intermediate.name': 'Intermedio',
-  'level.intermediate.blurb':
-    'Mantengo conversaciones cortas con errores.',
-  'level.upperIntermediate.name': 'Intermedio alto',
-  'level.upperIntermediate.blurb':
-    'Escribo en el trabajo pero quiero sonar natural.',
-
-  'interest.softwareDev': 'Desarrollo',
-  'interest.architecture': 'Arquitectura',
-  'interest.devops': 'DevOps',
+  'interest.softwareDev': 'Desarrollo de software',
+  'interest.architecture': 'Arquitectura de software',
+  'interest.devops': 'DevOps / SRE',
   'interest.data': 'Datos',
-  'interest.business': 'Negocios',
-  'interest.design': 'Diseño',
-  'interest.marketing': 'Marketing',
-  'interest.finance': 'Finanzas',
-  'interest.medicine': 'Medicina',
-  'interest.gaming': 'Videojuegos',
-  'interest.travel': 'Viajes',
-  'interest.music': 'Música',
-  'interest.management': 'Gestión',
-  'interest.psychology': 'Psicología',
-  'interest.education': 'Educación',
+  'interest.productMgmt': 'Gestión de producto',
+  'interest.design': 'Diseño de producto',
+  'interest.qa': 'QA / pruebas',
+  'interest.cybersecurity': 'Ciberseguridad',
+  'interest.engMgmt': 'Gestión de ingeniería',
   'interest.everydayLife': 'Vida diaria',
 
   'topic.presentSimple': 'Presente simple',
@@ -403,7 +334,6 @@ const it: Record<keyof typeof ru, string> = {
   'settings.section.editProfile': 'Profilo',
   'settings.label.learningLanguage': 'Lingua che impari',
   'settings.label.interests': 'Interessi',
-  'settings.label.level': 'Livello',
 
   'onboarding.button.begin': 'Inizia',
   'onboarding.button.continue': 'Continua',
@@ -419,41 +349,19 @@ const it: Record<keyof typeof ru, string> = {
   'onboarding.languages.title': 'Cosa vuoi\nimparare?',
   'onboarding.languages.subtitle': 'Puoi cambiarlo dopo nelle Impostazioni.',
 
-  'onboarding.level.title': 'A che punto sei\nora?',
-  'onboarding.level.subtitle':
-    'Sii onesto — puoi cambiarlo in qualsiasi momento.',
-
   'onboarding.interests.title': 'Scegli qualche mondo\nche conosci bene.',
   'onboarding.interests.subtitle':
     'Prenderemo le frasi da questi temi. {count} selezionati.',
 
-  'level.beginner.name': 'Principiante',
-  'level.beginner.blurb': 'Conosco parole base e un po\' di presente.',
-  'level.beginnerIntermediate.name': 'Pre-intermedio',
-  'level.beginnerIntermediate.blurb':
-    'Riesco a farmi capire in frasi brevi.',
-  'level.intermediate.name': 'Intermedio',
-  'level.intermediate.blurb':
-    'Sostengo brevi conversazioni con errori.',
-  'level.upperIntermediate.name': 'Intermedio alto',
-  'level.upperIntermediate.blurb':
-    'Scrivo al lavoro ma voglio suonare naturale.',
-
-  'interest.softwareDev': 'Sviluppo',
-  'interest.architecture': 'Architettura',
-  'interest.devops': 'DevOps',
+  'interest.softwareDev': 'Sviluppo software',
+  'interest.architecture': 'Architettura software',
+  'interest.devops': 'DevOps / SRE',
   'interest.data': 'Dati',
-  'interest.business': 'Business',
-  'interest.design': 'Design',
-  'interest.marketing': 'Marketing',
-  'interest.finance': 'Finanza',
-  'interest.medicine': 'Medicina',
-  'interest.gaming': 'Videogiochi',
-  'interest.travel': 'Viaggi',
-  'interest.music': 'Musica',
-  'interest.management': 'Management',
-  'interest.psychology': 'Psicologia',
-  'interest.education': 'Istruzione',
+  'interest.productMgmt': 'Product management',
+  'interest.design': 'Design di prodotto',
+  'interest.qa': 'QA / testing',
+  'interest.cybersecurity': 'Cybersecurity',
+  'interest.engMgmt': 'Engineering management',
   'interest.everydayLife': 'Vita quotidiana',
 
   'topic.presentSimple': 'Presente indicativo',

@@ -5,20 +5,18 @@ import { PROXY_URL, requestTutorTurn } from './index';
 const profile: UserProfile = {
   nativeLanguage: 'ru',
   targetLanguage: 'en',
-  level: 'intermediate',
   interests: [],
   preferredPracticeMode: 'translation',
 };
 const checkpoint: LearningCheckpoint = {
   userProfile: profile,
-  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
+  currentLearningFocus: { grammarTopic: 'Present Simple', rule: '' },
 };
 const exercise: Exercise = {
   sourceLanguage: 'ru',
   targetLanguage: 'en',
   sentence: 'Я работаю.',
   grammarTopic: 'Present Simple',
-  difficulty: 1,
 };
 const input = {
   userProfile: profile,
@@ -36,7 +34,6 @@ const validPayload = {
     targetLanguage: 'en',
     sentence: 'Я работаю удалённо.',
     grammarTopic: 'Present Simple',
-    difficulty: 1,
   },
 };
 

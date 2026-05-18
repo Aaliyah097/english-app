@@ -1,6 +1,6 @@
-// Screen barrel. The Progress screen was folded into the chat itself
-// (PracticeScreen renders a TopicPicker inside the rule bubble), so v1
-// ships three screens: Onboarding, Practice, Settings.
+// Screen barrel. v1 ships three screens — Onboarding, Practice, Settings.
+// Topic selection lives inside Practice (TopicPicker opens from the rule
+// bubble), so there is no separate Progress screen.
 
 export { OnboardingScreen } from './onboarding/OnboardingScreen';
 export { PracticeScreen } from './practice/PracticeScreen';

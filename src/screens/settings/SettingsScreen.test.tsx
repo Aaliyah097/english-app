@@ -9,15 +9,13 @@ import { SettingsScreen } from './SettingsScreen';
 const SAMPLE_PROFILE: UserProfile = userProfileSchema.parse({
   nativeLanguage: 'ru',
   targetLanguage: 'en',
-  level: 'intermediate',
-  interests: ['Software dev', 'Architecture'],
+  interests: ['Software development', 'Software architecture'],
   preferredPracticeMode: 'translation',
 });
 
 const SAMPLE_CHECKPOINT: LearningCheckpoint = learningCheckpointSchema.parse({
   userProfile: SAMPLE_PROFILE,
-  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
-  recentMistakes: [],
+  currentLearningFocus: { grammarTopic: 'Present Simple', rule: '' },
 });
 
 describe('SettingsScreen', () => {
@@ -37,8 +35,8 @@ describe('SettingsScreen', () => {
     await user.click(screen.getByRole('button', { name: 'Data' }));
     expect(getUserProfile()?.interests).toContain('Data');
 
-    // Toggle 'Software dev' off (it was seeded).
-    await user.click(screen.getByRole('button', { name: /Software dev/i }));
-    expect(getUserProfile()?.interests).not.toContain('Software dev');
+    // Toggle 'Software development' off (it was seeded).
+    await user.click(screen.getByRole('button', { name: /Software development/i }));
+    expect(getUserProfile()?.interests).not.toContain('Software development');
   });
 });

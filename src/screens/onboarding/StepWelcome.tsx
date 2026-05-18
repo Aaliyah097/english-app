@@ -144,7 +144,7 @@ export function StepWelcome() {
           {t(locale, 'onboarding.welcome.sampleLabel')}
         </div>
         <div style={{ color: T.ink2, fontSize: 14, marginBottom: 12, lineHeight: 1.4 }}>
-          Каждое утро она пьёт кофе и читает газету на балконе.
+          Каждое утро она открывает дашборд и проверяет ночные цифры.
         </div>
 
         <div style={{ height: 0.5, background: T.border, margin: '12px -18px' }} />
@@ -163,8 +163,8 @@ export function StepWelcome() {
           Ваш перевод
         </div>
         <div style={{ color: T.ink2, fontSize: 14, lineHeight: 1.5, marginBottom: 12 }}>
-          Every morning she <Wrong>drink</Wrong> coffee and <Wrong>read</Wrong> newspaper on
-          balcony.
+          Every morning she <Wrong>open</Wrong> dashboard and <Wrong>check</Wrong> overnight
+          numbers.
         </div>
 
         <div
@@ -180,8 +180,8 @@ export function StepWelcome() {
           Исправлено
         </div>
         <div style={{ color: T.ink, fontSize: 14, lineHeight: 1.5, marginBottom: 14 }}>
-          Every morning she <Fix>drinks</Fix> coffee and <Fix>reads</Fix>{' '}
-          <Fix>the</Fix> newspaper on <Fix>the</Fix> balcony.
+          Every morning she <Fix>opens</Fix> <Fix>the</Fix> dashboard and{' '}
+          <Fix>checks</Fix> <Fix>the</Fix> overnight numbers.
         </div>
 
         <div
@@ -195,11 +195,11 @@ export function StepWelcome() {
         >
           <Bullet>
             <b style={{ color: T.ink }}>Третье лицо ед. ч.</b> Подлежащее «она» — глагол
-            берёт окончание <i>-s</i>.
+            берёт окончание <i>-s</i>: <i>opens</i>, <i>checks</i>.
           </Bullet>
           <Bullet>
-            <b style={{ color: T.ink }}>Артикль.</b> Перед существительными в общем смысле
-            нужен артикль: <i>the</i> newspaper, <i>the</i> balcony.
+            <b style={{ color: T.ink }}>Артикль.</b> Перед конкретным существительным
+            нужен <i>the</i>: <i>the</i> dashboard, <i>the</i> numbers.
           </Bullet>
         </div>
       </div>

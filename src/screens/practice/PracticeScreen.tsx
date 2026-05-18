@@ -12,7 +12,7 @@ import {
   defaultRuleKeyFor,
   explanationFor,
   topicLabelKeyFor,
-} from '../progress/grammarPath';
+} from './grammarPath';
 import { t } from '../../i18n';
 import { useLocale } from '../../i18n/useLocale';
 
@@ -31,7 +31,6 @@ function seedExerciseFromCheckpoint(
     targetLanguage: profile.targetLanguage,
     sentence: '',
     grammarTopic: checkpoint.currentLearningFocus.grammarTopic,
-    difficulty: checkpoint.currentLearningFocus.difficulty,
   };
 }
 
@@ -201,7 +200,6 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
     mergeCheckpoint({
       currentLearningFocus: {
         grammarTopic: topic,
-        difficulty: 1,
         // Clear the rule — the AI will fill in a target-language rule on
         // the next turn. The defaults in i18n are the fallback while we wait.
         rule: ruleKey ? t(locale, ruleKey) : '',
@@ -219,7 +217,6 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
       targetLanguage: profile.targetLanguage,
       sentence: '',
       grammarTopic: topic,
-      difficulty: 1,
     });
   }
 

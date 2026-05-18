@@ -16,14 +16,13 @@ import { STORAGE_KEYS } from './keys';
 const profile: UserProfile = {
   nativeLanguage: 'ru',
   targetLanguage: 'en',
-  level: 'intermediate',
   interests: ['software development'],
   preferredPracticeMode: 'translation',
 };
 
 const checkpoint: LearningCheckpoint = {
   userProfile: profile,
-  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
+  currentLearningFocus: { grammarTopic: 'Present Simple', rule: '' },
 };
 
 beforeEach(() => {
@@ -70,11 +69,10 @@ describe('storage — checkpoint', () => {
   it('mergeCheckpoint shallow-merges nested currentLearningFocus', () => {
     setCheckpoint(checkpoint);
     const merged = mergeCheckpoint({
-      currentLearningFocus: { grammarTopic: 'Past Simple', difficulty: 3, rule: '' },
+      currentLearningFocus: { grammarTopic: 'Past Simple', rule: '' },
     });
     expect(merged.currentLearningFocus).toEqual({
       grammarTopic: 'Past Simple',
-      difficulty: 3,
       rule: '',
     });
     // Top-level untouched fields preserved.

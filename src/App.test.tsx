@@ -19,14 +19,13 @@ vi.mock('./ai', async () => {
 const profile: UserProfile = {
   nativeLanguage: 'ru',
   targetLanguage: 'en',
-  level: 'intermediate',
   interests: ['software development'],
   preferredPracticeMode: 'translation',
 };
 
 const checkpoint: LearningCheckpoint = {
   userProfile: profile,
-  currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
+  currentLearningFocus: { grammarTopic: 'Present Simple', rule: '' },
 };
 
 beforeEach(() => {

@@ -2,6 +2,8 @@
   "name": "englishly",
   "private": true,
   "version": "0.1.0",
+  "description": "Local-first AI language tutor for Russian-speaking software professionals. Translate workplace sentences from Russian into English/Spanish/Italian and get short, grammar-focused corrections.",
+  "author": "vbolts",
   "type": "module",
   "engines": {
     "node": ">=18.19"

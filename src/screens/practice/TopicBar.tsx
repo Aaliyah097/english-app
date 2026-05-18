@@ -3,7 +3,7 @@ import { Icon } from '../../ui';
 import { t } from '../../i18n';
 import { useLocale } from '../../i18n/useLocale';
 import type { LearningCheckpoint } from '../../types';
-import { topicLabelKeyFor } from '../progress/grammarPath';
+import { topicLabelKeyFor } from './grammarPath';
 
 type Props = {
   checkpoint: LearningCheckpoint;

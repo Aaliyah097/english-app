@@ -3,25 +3,19 @@
 // turn input here; we build the prompt, call DeepSeek, validate the JSON
 // against the same Zod schema the client uses, and forward the result.
 //
-// Env vars required (set in Vercel project settings):
-//   DEEPSEEK_API_KEY  — the server-side key
-//   DEEPSEEK_MODEL    — optional; defaults to 'deepseek-chat'
+// Env vars (set in Vercel project settings):
+//   DEEPSEEK_API_KEY   — required; the server-side key
+//   DEEPSEEK_MODEL     — optional; defaults to 'deepseek-chat'
+//   DEEPSEEK_BASE_URL  — optional; defaults to 'https://api.deepseek.com/v1'
 
 import OpenAI from 'openai';
+import { z } from 'zod';
 import {
   exerciseSchema,
   learningCheckpointSchema,
   tutorResponseSchema,
   userProfileSchema,
 } from '../src/schemas';
-
-export const config = {
-  runtime: 'nodejs',
-};
-
-const PROVIDER_BASE_URL = 'https://api.deepseek.com/v1';
-
-import { z } from 'zod';
 
 const requestSchema = z.object({
   userProfile: userProfileSchema,
@@ -42,7 +36,7 @@ function buildSystemPrompt(profile: Req['userProfile']): string {
     '',
 
     // ── Role + I/O languages ────────────────────────────────────────────────
-    `You are a personal language tutor. The user's native language is "${profile.nativeLanguage}" and they are practising "${profile.targetLanguage}" at level "${profile.level}".`,
+    `You are a personal language tutor. The user's native language is "${profile.nativeLanguage}" and they are practising "${profile.targetLanguage}".`,
     `The user translates short sentences from their native language (${profile.nativeLanguage}) into the target language (${profile.targetLanguage}).`,
     '',
     `ALL human-readable text you emit (messageToUser, mistakes[].type, mistakes[].explanation, currentLearningFocus.rule) MUST be in the target language ("${profile.targetLanguage}"). The ONE exception is \`nextExercise.sentence\`, which MUST be in the user's NATIVE language ("${profile.nativeLanguage}") — that's the sentence the user translates FROM. \`correctedAnswer\` and \`mistakes[].example\` / \`mistakes[].correction\` are short fragments in the target language.`,
@@ -59,11 +53,26 @@ function buildSystemPrompt(profile: Req['userProfile']): string {
     '',
 
     // ── Exercise generation ────────────────────────────────────────────────
-    'Generate `nextExercise.sentence` to be useful for THIS user:',
-    '- Hit the current grammar focus and its difficulty (an integer 1-5).',
-    "- Reuse situations and vocabulary from USER_PROFILE.interests so the sentence sounds like something the user would actually say or read. If interests are empty or generic, use everyday-life scenarios.",
-    "- Vary structure across turns so you're not drilling the exact same pattern twice in a row.",
+    'Generate `nextExercise.sentence` to be useful for THIS user. The single most important thing: USER_PROFILE.interests describes what the user DOES FOR A LIVING in the software industry. Most of their waking hours are spent at work, so the sentence MUST sound like something they would actually say, write, or hear during a normal workday at a tech company — Slack messages, standup updates, code review comments, design reviews, planning meetings, deploys, incidents, on-call rotations, retros, handoffs, 1:1s.',
+    '',
+    'Concrete examples by interest (style only — do not reuse the literal sentences):',
+    '- Software development: "I opened a pull request for the new auth endpoint." / "We are refactoring the payments module this sprint."',
+    '- Software architecture: "The new service should communicate through a message queue." / "We decided to extract the billing logic into a separate library."',
+    '- DevOps / SRE: "I deployed the new version to staging yesterday." / "We need to roll back the migration before the morning standup."',
+    '- Data: "The dashboard shows a clear drop in conversion after the last release." / "I am rewriting the nightly aggregation query."',
+    '- Product management: "The team finalised the roadmap for the next quarter." / "I am scheduling a discovery call with three pilot customers."',
+    '- Product design: "The designer sent me three new mockups for the checkout page." / "We are reviewing the new design system on Friday."',
+    '- QA / testing: "I added a regression test for the bug we shipped last week." / "The new release broke two end-to-end scenarios."',
+    '- Cybersecurity: "We patched the vulnerability before the audit started." / "I am rotating the production credentials this evening."',
+    '- Engineering management: "I am scheduling a one-on-one with each engineer this week." / "We need to push the launch by two weeks because of the staffing gap."',
+    '',
+    'Rules:',
+    '- Hit the current grammar focus naturally. The grammar should sit inside the workplace sentence, not be the point of it.',
+    '- Use the user\'s ACTUAL interests as the profession. If interests include "Software development" and "DevOps / SRE", they are a backend / infra engineer — write sentences from that life. Combine interests when they overlap (e.g. "Product design" + "Product management" = a designer who works closely with PMs).',
+    "- Vary the scenario across turns — don't drill the same meeting / deploy / deadline twice in a row.",
     '- The sentence must be a complete, natural-sounding clause in the native language — not a vocabulary list or a fragment.',
+    '- If interests are empty or only "Everyday life", fall back to relatable adult daily-life sentences (commuting, paying bills, making plans with friends).',
+    '- AVOID textbook-flavoured sentences ("The boy reads the book"), travel-brochure sentences ("We visit the museum"), and abstract philosophical sentences. The user is at their desk, not on holiday.',
     '',
 
     // ── Rule field on topic change ─────────────────────────────────────────
@@ -88,17 +97,16 @@ function buildSystemPrompt(profile: Req['userProfile']): string {
     '    }',
     '  ],',
     '  "updatedCheckpoint": {              // include ONLY fields that changed; omit the rest',
-    '    "currentLearningFocus"?:   { "grammarTopic": string, "sentenceType"?: string, "difficulty": number, "rule"?: string }',
+    '    "currentLearningFocus"?:   { "grammarTopic": string, "rule"?: string }',
     '  },',
     '  "nextExercise": {',
     '    "sourceLanguage": string, "targetLanguage": string,',
-    '    "sentence": string, "grammarTopic": string, "difficulty": number',
+    '    "sentence": string, "grammarTopic": string',
     '  }',
     '}',
     '',
     'mistakes is REQUIRED. Use an empty array [] when the answer is correct.',
     'Use a DISTINCT `type` for each unique rule. If the user makes the same kind of mistake twice in one sentence (e.g. two missing articles), emit ONE mistake whose `example` and `correction` cover both spots — not two near-duplicate bullets.',
-    'difficulty MUST be an integer in [1, 5].',
   ].join('\n');
 }
 
@@ -154,7 +162,8 @@ export default async function handler(req: Request): Promise<Response> {
     );
   }
 
-  const client = new OpenAI({ apiKey: key, baseURL: PROVIDER_BASE_URL });
+  const baseURL = process.env.DEEPSEEK_BASE_URL ?? 'https://api.deepseek.com/v1';
+  const client = new OpenAI({ apiKey: key, baseURL });
   const model = process.env.DEEPSEEK_MODEL ?? 'deepseek-chat';
 
   let completion;

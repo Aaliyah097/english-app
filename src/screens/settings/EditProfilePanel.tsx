@@ -7,11 +7,11 @@ import {
   subscribe,
 } from '../../storage';
 import { theme as T } from '../../theme';
-import type { Level, UserProfile } from '../../types';
+import type { UserProfile } from '../../types';
 import { Icon } from '../../ui';
 import { t } from '../../i18n';
 import { useLocale } from '../../i18n/useLocale';
-import { ALL_INTERESTS, LEVELS, TARGET_LANGUAGES } from '../onboarding/options';
+import { ALL_INTERESTS, TARGET_LANGUAGES } from '../onboarding/options';
 
 function useProfile(): UserProfile | null {
   const [, setTick] = useState(0);
@@ -81,8 +81,6 @@ export function EditProfilePanel() {
       });
     }
   };
-  const setLevel = (level: Level) => updateProfile({ level });
-
   return (
     <PanelCard>
       <div>
@@ -151,47 +149,6 @@ export function EditProfilePanel() {
               >
                 {on && <Icon.Check s={12} />}
                 {t(locale, labelKey)}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div>
-        <SubLabel>{t(locale, 'settings.label.level')}</SubLabel>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
-          {LEVELS.map((l) => {
-            const on = profile.level === l.id;
-            return (
-              <button
-                key={l.id}
-                type="button"
-                onClick={() => setLevel(l.id)}
-                aria-pressed={on}
-                style={{
-                  background: on ? T.ink : T.surface,
-                  color: on ? T.bg : T.ink,
-                  border: `0.5px solid ${on ? T.ink : T.border}`,
-                  borderRadius: 16,
-                  padding: '12px 16px',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  fontFamily: T.fontBody,
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <div style={{ fontSize: 14.5, fontWeight: 500 }}>{t(locale, l.nameKey)}</div>
-                  {on && <Icon.Check s={14} />}
-                </div>
-                <div style={{ fontSize: 12, opacity: 0.7, marginTop: 3, lineHeight: 1.35 }}>
-                  {t(locale, l.blurbKey)}
-                </div>
               </button>
             );
           })}

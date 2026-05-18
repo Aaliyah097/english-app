@@ -3,19 +3,11 @@
 
 import { z } from 'zod';
 
-export const levelSchema = z.enum([
-  'beginner',
-  'beginner_intermediate',
-  'intermediate',
-  'upper_intermediate',
-]);
-
 export const userProfileSchema = z.object({
   // Language codes are short — capping to a sane length prevents a tampered
   // payload from stuffing the prompt with a giant "language code".
   nativeLanguage: z.string().min(1).max(10),
   targetLanguage: z.string().min(1).max(10),
-  level: levelSchema,
   // ALL_INTERESTS lists 16 canonical entries; capping at 20 leaves room
   // for the user's onboarding choices without allowing prompt bloat. Per-item
   // length cap blocks the "single 250KB interest string" vector.
@@ -35,13 +27,10 @@ export const exerciseSchema = z.object({
   targetLanguage: z.string().min(1).max(10),
   sentence: z.string().max(600),
   grammarTopic: z.string().min(1).max(100),
-  difficulty: z.number().int().min(1).max(5),
 });
 
 const currentLearningFocusSchema = z.object({
   grammarTopic: z.string().min(1).max(100),
-  sentenceType: z.string().max(100).optional(),
-  difficulty: z.number().int().min(1).max(5),
   // One-sentence rule explanation for the current grammar topic. Maintained
   // by the AI: included when the topic changes (or when it's blank), omitted
   // on subsequent turns of the same topic. Defaults to '' so old checkpoints

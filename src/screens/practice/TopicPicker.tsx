@@ -6,7 +6,7 @@
 import { theme as T } from '../../theme';
 import { t } from '../../i18n';
 import { useLocale } from '../../i18n/useLocale';
-import { GRAMMAR_PATH, topicLabelKeyFor } from '../progress/grammarPath';
+import { GRAMMAR_PATH, topicLabelKeyFor } from './grammarPath';
 
 type Props = {
   currentTopic: string;
