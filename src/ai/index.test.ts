@@ -13,7 +13,6 @@ const checkpoint: LearningCheckpoint = {
   userProfile: profile,
   currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
   completedTopics: [],
-  currentTopicProgress: { topic: 'Present Simple', completedExercises: 0, knownWeaknesses: [] },
   lastCheckpointSummary: '',
 };
 const exercise: Exercise = {

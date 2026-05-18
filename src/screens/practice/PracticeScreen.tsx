@@ -206,11 +206,6 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
         // the next turn. The defaults in i18n are the fallback while we wait.
         rule: ruleKey ? t(locale, ruleKey) : '',
       },
-      currentTopicProgress: {
-        topic,
-        completedExercises: 0,
-        knownWeaknesses: [],
-      },
     });
     setLastResult(null);
     setUserAnswer('');

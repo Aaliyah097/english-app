@@ -62,11 +62,6 @@ export function OnboardingScreen({ onComplete }: Props) {
         rule: '',
       },
       completedTopics: [],
-      currentTopicProgress: {
-        topic: 'Present Simple',
-        completedExercises: 0,
-        knownWeaknesses: [],
-      },
       lastCheckpointSummary: '',
     });
 

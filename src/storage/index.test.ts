@@ -25,11 +25,6 @@ const checkpoint: LearningCheckpoint = {
   userProfile: profile,
   currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
   completedTopics: [],
-  currentTopicProgress: {
-    topic: 'Present Simple',
-    completedExercises: 0,
-    knownWeaknesses: [],
-  },
   lastCheckpointSummary: '',
 };
 
@@ -87,18 +82,6 @@ describe('storage — checkpoint', () => {
     // Top-level untouched fields preserved.
     expect(merged.userProfile).toEqual(profile);
     expect(merged.lastCheckpointSummary).toBe('');
-  });
-
-  it('mergeCheckpoint shallow-merges currentTopicProgress', () => {
-    setCheckpoint(checkpoint);
-    const merged = mergeCheckpoint({
-      currentTopicProgress: {
-        topic: 'Present Simple',
-        completedExercises: 5,
-        knownWeaknesses: [],
-      },
-    });
-    expect(merged.currentTopicProgress.completedExercises).toBe(5);
   });
 
   it('mergeCheckpoint throws when no checkpoint exists', () => {

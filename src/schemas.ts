@@ -49,32 +49,24 @@ const currentLearningFocusSchema = z.object({
   rule: z.string().max(500).default(''),
 });
 
-const currentTopicProgressSchema = z.object({
-  topic: z.string().min(1).max(100),
-  completedExercises: z.number().int().min(0),
-  knownWeaknesses: z.array(z.string().min(1).max(100)).max(20),
-});
-
 export const learningCheckpointSchema = z.object({
   userProfile: userProfileSchema,
   currentLearningFocus: currentLearningFocusSchema,
   completedTopics: z.array(z.string().min(1).max(100)).max(50),
-  currentTopicProgress: currentTopicProgressSchema,
   lastCheckpointSummary: z.string().max(2000),
 });
 
-// Patch shape the AI returns in `updatedCheckpoint`. Both top-level keys AND
-// the two nested objects are partial — the model commonly sends only the
-// inner fields that changed. `mergeCheckpoint` in src/storage shallow-merges
-// the nested objects against the stored checkpoint, then re-validates the
-// whole thing against learningCheckpointSchema, so the strict invariant
+// Patch shape the AI returns in `updatedCheckpoint`. Top-level keys are
+// optional and `currentLearningFocus` is itself partial — the model commonly
+// sends only the inner fields that changed. `mergeCheckpoint` in src/storage
+// shallow-merges the nested object against the stored checkpoint, then
+// re-validates against learningCheckpointSchema so the strict invariant
 // still holds after the merge.
 export const partialLearningCheckpointSchema = z
   .object({
     userProfile: userProfileSchema,
     currentLearningFocus: currentLearningFocusSchema.partial(),
     completedTopics: z.array(z.string()),
-    currentTopicProgress: currentTopicProgressSchema.partial(),
     lastCheckpointSummary: z.string(),
   })
   .partial();

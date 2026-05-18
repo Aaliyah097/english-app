@@ -19,11 +19,6 @@ const SAMPLE_CHECKPOINT: LearningCheckpoint = learningCheckpointSchema.parse({
   currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
   recentMistakes: [],
   completedTopics: [],
-  currentTopicProgress: {
-    topic: 'Present Simple',
-    completedExercises: 0,
-    knownWeaknesses: [],
-  },
   lastCheckpointSummary: '',
 });
 

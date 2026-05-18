@@ -20,11 +20,6 @@ const validCheckpoint: LearningCheckpoint = {
   userProfile: validProfile,
   currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
   completedTopics: [],
-  currentTopicProgress: {
-    topic: 'Present Simple',
-    completedExercises: 0,
-    knownWeaknesses: [],
-  },
   lastCheckpointSummary: '',
 };
 
@@ -69,26 +64,15 @@ describe('schemas', () => {
     expect(partialLearningCheckpointSchema.parse({})).toEqual({});
   });
 
-  it('partialLearningCheckpointSchema accepts partial nested objects', () => {
+  it('partialLearningCheckpointSchema accepts a partial nested currentLearningFocus', () => {
     // The AI commonly sends only the inner fields that changed (e.g. just
-    // completedExercises + knownWeaknesses, omitting topic). This must parse —
-    // the storage layer's mergeCheckpoint deep-merges before re-validating
-    // against the strict schema.
+    // `rule` without re-stating grammarTopic + difficulty). This must parse —
+    // mergeCheckpoint deep-merges before re-validating against the strict
+    // schema.
     const partialPatch = {
-      currentTopicProgress: {
-        completedExercises: 4,
-        knownWeaknesses: ['articles with general plurals'],
-      },
+      currentLearningFocus: { rule: 'Use Past Simple for finished actions.' },
     };
     expect(partialLearningCheckpointSchema.safeParse(partialPatch).success).toBe(true);
-  });
-
-  it('full learningCheckpointSchema still requires nested fields', () => {
-    const incomplete = {
-      ...validCheckpoint,
-      currentTopicProgress: { completedExercises: 4, knownWeaknesses: [] },
-    };
-    expect(learningCheckpointSchema.safeParse(incomplete).success).toBe(false);
   });
 
   it('tutorResponseSchema accepts a valid response', () => {

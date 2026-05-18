@@ -86,10 +86,10 @@ export function setUserProfile(p: UserProfile): void {
 }
 
 /**
- * Shallow-merge a partial checkpoint into the existing one. The two nested
- * objects (currentLearningFocus, currentTopicProgress) are also shallow-merged
- * so a patch can touch one inner field without clobbering its siblings.
- * Top-level arrays like `completedTopics` are replaced wholesale by the patch.
+ * Shallow-merge a partial checkpoint into the existing one. The nested
+ * `currentLearningFocus` object is also shallow-merged so a patch can touch
+ * one inner field without clobbering its siblings. Top-level arrays like
+ * `completedTopics` are replaced wholesale by the patch.
  */
 export function mergeCheckpoint(
   patch: PartialLearningCheckpoint,
@@ -112,10 +112,6 @@ export function mergeCheckpoint(
     currentLearningFocus: {
       ...current.currentLearningFocus,
       ...(patch.currentLearningFocus ?? {}),
-    },
-    currentTopicProgress: {
-      ...current.currentTopicProgress,
-      ...(patch.currentTopicProgress ?? {}),
     },
   } as LearningCheckpoint;
 
