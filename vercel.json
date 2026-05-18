@@ -3,7 +3,6 @@
   "framework": "vite",
   "buildCommand": "vite build",
   "outputDirectory": "dist",
-  "regions": ["hnd1"],
   "functions": {
     "api/tutor.ts": {
       "maxDuration": 60
