@@ -17,6 +17,12 @@ import {
   userProfileSchema,
 } from '../src/schemas.js';
 
+// Configure this function inline (Vercel reads `export const config`).
+// maxDuration must accommodate the worst-case DeepSeek response time.
+export const config = {
+  maxDuration: 60,
+};
+
 const requestSchema = z.object({
   userProfile: userProfileSchema,
   checkpoint: learningCheckpointSchema,
