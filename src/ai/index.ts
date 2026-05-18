@@ -12,10 +12,10 @@ import type { Exercise, LearningCheckpoint, TutorResponse, UserProfile } from '.
 export const PROXY_URL = '/api/tutor';
 
 // A tutor turn is normally back in 5-15s. Client timeout is set just under
-// the Vercel function timeout (30s in vercel.json) so the client error
+// the Vercel function timeout (60s in vercel.json) so the client error
 // message wins if the upstream is genuinely hung — the server cap still
 // catches the truly-stuck case.
-const TUTOR_TIMEOUT_MS = 28_000;
+const TUTOR_TIMEOUT_MS = 58_000;
 
 export type TutorTurnInput = {
   userProfile: UserProfile;

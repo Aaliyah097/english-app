@@ -163,7 +163,10 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const baseURL = process.env.DEEPSEEK_BASE_URL ?? 'https://api.deepseek.com/v1';
-  const client = new OpenAI({ apiKey: key, baseURL });
+  // 55s timeout on the SDK call, leaving 5s for our own validation + response
+  // serialisation under the Vercel function's 60s cap. Without this we'd let
+  // Vercel kill the function blind; with it we surface a clean 502.
+  const client = new OpenAI({ apiKey: key, baseURL, timeout: 55_000 });
   const model = process.env.DEEPSEEK_MODEL ?? 'deepseek-chat';
 
   let completion;
@@ -172,10 +175,12 @@ export default async function handler(req: Request): Promise<Response> {
       model,
       response_format: { type: 'json_object' },
       temperature: 0.4,
-      // Hard ceiling on response size — a tutor turn is bounded; longer
-      // responses are runaway and shouldn't bill us. Schema validation
-      // would reject anything weirdly truncated anyway.
-      max_tokens: 1200,
+      // Hard ceiling on response size. At DeepSeek-V3 throughput (~25-40 tok/s)
+      // 600 tokens caps generation around 15-25s, fitting under our 60s
+      // function budget with headroom for slow turns. Real tutor responses
+      // rarely exceed 500 tokens; schema validation would reject anything
+      // weirdly truncated anyway.
+      max_tokens: 600,
       messages: [
         { role: 'system', content: buildSystemPrompt(parsed.data.userProfile) },
         { role: 'user', content: buildUserPrompt(parsed.data) },
