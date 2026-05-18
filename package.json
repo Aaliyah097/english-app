@@ -5,9 +5,6 @@
   "description": "Local-first AI language tutor for Russian-speaking software professionals. Translate workplace sentences from Russian into English/Spanish/Italian and get short, grammar-focused corrections.",
   "author": "vbolts",
   "type": "module",
-  "engines": {
-    "node": "20.x"
-  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
