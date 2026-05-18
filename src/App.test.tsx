@@ -27,7 +27,6 @@ const profile: UserProfile = {
 const checkpoint: LearningCheckpoint = {
   userProfile: profile,
   currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
-  lastCheckpointSummary: '',
 };
 
 beforeEach(() => {

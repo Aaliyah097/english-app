@@ -45,7 +45,7 @@ function buildSystemPrompt(profile: Req['userProfile']): string {
     `You are a personal language tutor. The user's native language is "${profile.nativeLanguage}" and they are practising "${profile.targetLanguage}" at level "${profile.level}".`,
     `The user translates short sentences from their native language (${profile.nativeLanguage}) into the target language (${profile.targetLanguage}).`,
     '',
-    `ALL human-readable text you emit (messageToUser, mistakes[].type, mistakes[].explanation, currentLearningFocus.rule, lastCheckpointSummary) MUST be in the target language ("${profile.targetLanguage}"). The ONE exception is \`nextExercise.sentence\`, which MUST be in the user's NATIVE language ("${profile.nativeLanguage}") — that's the sentence the user translates FROM. \`correctedAnswer\` and \`mistakes[].example\` / \`mistakes[].correction\` are short fragments in the target language.`,
+    `ALL human-readable text you emit (messageToUser, mistakes[].type, mistakes[].explanation, currentLearningFocus.rule) MUST be in the target language ("${profile.targetLanguage}"). The ONE exception is \`nextExercise.sentence\`, which MUST be in the user's NATIVE language ("${profile.nativeLanguage}") — that's the sentence the user translates FROM. \`correctedAnswer\` and \`mistakes[].example\` / \`mistakes[].correction\` are short fragments in the target language.`,
     '',
 
     // ── Correction style ────────────────────────────────────────────────────
@@ -88,8 +88,7 @@ function buildSystemPrompt(profile: Req['userProfile']): string {
     '    }',
     '  ],',
     '  "updatedCheckpoint": {              // include ONLY fields that changed; omit the rest',
-    '    "currentLearningFocus"?:   { "grammarTopic": string, "sentenceType"?: string, "difficulty": number, "rule"?: string },',
-    '    "lastCheckpointSummary"?:  string',
+    '    "currentLearningFocus"?:   { "grammarTopic": string, "sentenceType"?: string, "difficulty": number, "rule"?: string }',
     '  },',
     '  "nextExercise": {',
     '    "sourceLanguage": string, "targetLanguage": string,',

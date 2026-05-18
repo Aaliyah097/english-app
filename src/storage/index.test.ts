@@ -24,7 +24,6 @@ const profile: UserProfile = {
 const checkpoint: LearningCheckpoint = {
   userProfile: profile,
   currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
-  lastCheckpointSummary: '',
 };
 
 beforeEach(() => {
@@ -80,7 +79,6 @@ describe('storage — checkpoint', () => {
     });
     // Top-level untouched fields preserved.
     expect(merged.userProfile).toEqual(profile);
-    expect(merged.lastCheckpointSummary).toBe('');
   });
 
   it('mergeCheckpoint throws when no checkpoint exists', () => {

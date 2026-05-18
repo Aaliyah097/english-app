@@ -52,7 +52,6 @@ const currentLearningFocusSchema = z.object({
 export const learningCheckpointSchema = z.object({
   userProfile: userProfileSchema,
   currentLearningFocus: currentLearningFocusSchema,
-  lastCheckpointSummary: z.string().max(2000),
 });
 
 // Patch shape the AI returns in `updatedCheckpoint`. Top-level keys are
@@ -65,7 +64,6 @@ export const partialLearningCheckpointSchema = z
   .object({
     userProfile: userProfileSchema,
     currentLearningFocus: currentLearningFocusSchema.partial(),
-    lastCheckpointSummary: z.string(),
   })
   .partial();
 

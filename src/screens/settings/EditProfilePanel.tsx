@@ -78,7 +78,6 @@ export function EditProfilePanel() {
       // the AI regenerate them in the new target language.
       mergeCheckpoint({
         currentLearningFocus: { rule: '' },
-        lastCheckpointSummary: '',
       });
     }
   };

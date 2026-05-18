@@ -19,7 +19,6 @@ const validProfile: UserProfile = {
 const validCheckpoint: LearningCheckpoint = {
   userProfile: validProfile,
   currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
-  lastCheckpointSummary: '',
 };
 
 const validResponse: TutorResponse = {

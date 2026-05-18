@@ -61,7 +61,6 @@ export function OnboardingScreen({ onComplete }: Props) {
         // until then.
         rule: '',
       },
-      lastCheckpointSummary: '',
     });
 
     // Single write — the checkpoint carries the profile as a nested field.
