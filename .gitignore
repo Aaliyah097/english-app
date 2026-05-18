@@ -5,8 +5,23 @@ dist
 .vite
 coverage
 .DS_Store
+Thumbs.db
 *.log
 *.tsbuildinfo
-.env.local
+.eslintcache
+
+# All dotenv files are ignored — secrets must never be committed. The one
+# exception is .env.example, which IS tracked as a template for new clones.
+.env
+.env.*
+!.env.example
+
 docs
 .vercel
+
+# IDE / editor state
+/.idea
+/.vscode
+*.swp
+*.swo
+*~
