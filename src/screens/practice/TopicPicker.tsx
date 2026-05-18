@@ -1,26 +1,19 @@
-// Inline expandable topic picker. Lives inside the rule bubble — the user
-// taps the "Rule · Topic" header to open it, then taps a row to switch the
-// current grammar focus. Replaces the Progress screen's topic-path view.
+// Inline expandable topic picker mounted from the TopicBar. All 13 canonical
+// topics are pickable; the currently-selected one gets an accent background
+// and a "Current" pill. No completion / locking — the audience is intermediate
+// learners who can jump topics freely.
 
 import { theme as T } from '../../theme';
-import { Icon } from '../../ui';
 import { t } from '../../i18n';
 import { useLocale } from '../../i18n/useLocale';
-import {
-  GRAMMAR_PATH,
-  tagGrammarPath,
-  topicLabelKeyFor,
-  type GrammarPathState,
-} from '../progress/grammarPath';
+import { GRAMMAR_PATH, topicLabelKeyFor } from '../progress/grammarPath';
 
 type Props = {
   currentTopic: string;
-  completedTopics: string[];
   onPick: (topic: string) => void;
 };
 
-export function TopicPicker({ currentTopic, completedTopics, onPick }: Props) {
-  const tagged = tagGrammarPath(completedTopics, currentTopic);
+export function TopicPicker({ currentTopic, onPick }: Props) {
   const locale = useLocale();
 
   return (
@@ -38,16 +31,14 @@ export function TopicPicker({ currentTopic, completedTopics, onPick }: Props) {
         overflow: 'auto',
       }}
     >
-      {tagged.map(({ name, state }) => {
-        const disabled = state === 'locked';
-        const isCurrent = state === 'current';
+      {GRAMMAR_PATH.map((name) => {
+        const isCurrent = name === currentTopic;
         const labelKey = topicLabelKeyFor(name);
         const display = labelKey ? t(locale, labelKey) : name;
         return (
           <button
             key={name}
             type="button"
-            disabled={disabled}
             onClick={() => onPick(name)}
             style={{
               display: 'flex',
@@ -59,8 +50,7 @@ export function TopicPicker({ currentTopic, completedTopics, onPick }: Props) {
               borderRadius: 10,
               padding: '8px 12px',
               textAlign: 'left',
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              opacity: disabled ? 0.45 : 1,
+              cursor: 'pointer',
               fontFamily: T.fontBody,
               color: isCurrent ? T.accentInk : T.ink,
               fontSize: 13.5,
@@ -68,78 +58,29 @@ export function TopicPicker({ currentTopic, completedTopics, onPick }: Props) {
             }}
           >
             <span>{display}</span>
-            <StatePill
-              state={state}
-              currentLabel={t(locale, 'picker.state.current')}
-              doneLabel={t(locale, 'picker.state.done')}
-            />
+            {isCurrent && (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  background: T.accentSoft,
+                  color: T.accent,
+                  border: `0.5px solid ${T.accentSoft}`,
+                  borderRadius: 999,
+                  padding: '2px 8px',
+                  fontFamily: T.fontMono,
+                  fontSize: 10,
+                  letterSpacing: 0.5,
+                  textTransform: 'uppercase',
+                  flexShrink: 0,
+                }}
+              >
+                {t(locale, 'picker.state.current')}
+              </span>
+            )}
           </button>
         );
       })}
     </div>
   );
 }
-
-// Only the two "actionable" states get a label. Upcoming rows are clickable
-// but unadorned; locked rows are visually muted via the row's own opacity.
-function StatePill({
-  state,
-  currentLabel,
-  doneLabel,
-}: {
-  state: GrammarPathState;
-  currentLabel: string;
-  doneLabel: string;
-}) {
-  if (state === 'current') {
-    return <Tag color={T.accent} bg={T.accentSoft} label={currentLabel} />;
-  }
-  if (state === 'completed') {
-    return (
-      <Tag color={T.good} bg={T.goodSoft} label={doneLabel}>
-        <Icon.Check s={10} />
-      </Tag>
-    );
-  }
-  return null;
-}
-
-function Tag({
-  color,
-  bg,
-  label,
-  border,
-  children,
-}: {
-  color: string;
-  bg: string;
-  label: string;
-  border?: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        background: bg,
-        color,
-        border: `0.5px solid ${border ?? bg}`,
-        borderRadius: 999,
-        padding: '2px 8px',
-        fontFamily: T.fontMono,
-        fontSize: 10,
-        letterSpacing: 0.5,
-        textTransform: 'uppercase',
-        flexShrink: 0,
-      }}
-    >
-      {children}
-      {label}
-    </span>
-  );
-}
-
-// Re-export so consumers don't need a second import.
-export { GRAMMAR_PATH };

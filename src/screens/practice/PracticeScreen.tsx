@@ -269,7 +269,6 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
         >
           <TopicPicker
             currentTopic={checkpoint.currentLearningFocus.grammarTopic}
-            completedTopics={checkpoint.completedTopics}
             onPick={handlePickTopic}
           />
         </div>

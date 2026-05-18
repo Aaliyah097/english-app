@@ -52,7 +52,6 @@ const currentLearningFocusSchema = z.object({
 export const learningCheckpointSchema = z.object({
   userProfile: userProfileSchema,
   currentLearningFocus: currentLearningFocusSchema,
-  completedTopics: z.array(z.string().min(1).max(100)).max(50),
   lastCheckpointSummary: z.string().max(2000),
 });
 
@@ -66,7 +65,6 @@ export const partialLearningCheckpointSchema = z
   .object({
     userProfile: userProfileSchema,
     currentLearningFocus: currentLearningFocusSchema.partial(),
-    completedTopics: z.array(z.string()),
     lastCheckpointSummary: z.string(),
   })
   .partial();

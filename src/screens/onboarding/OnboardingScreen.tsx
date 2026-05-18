@@ -61,7 +61,6 @@ export function OnboardingScreen({ onComplete }: Props) {
         // until then.
         rule: '',
       },
-      completedTopics: [],
       lastCheckpointSummary: '',
     });
 

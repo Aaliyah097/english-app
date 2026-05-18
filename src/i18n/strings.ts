@@ -32,7 +32,6 @@ const ru = {
 
   // ── Topic picker ────────────────────────────────────────────────────────
   'picker.state.current': 'Текущая',
-  'picker.state.done': 'Готово',
 
   // ── Settings screen ─────────────────────────────────────────────────────
   'settings.title': 'Настройки',
@@ -161,7 +160,6 @@ const en: Record<keyof typeof ru, string> = {
   'practice.settings.aria': 'Settings',
 
   'picker.state.current': 'Current',
-  'picker.state.done': 'Done',
 
   'settings.title': 'Settings',
   'settings.back.aria': 'Back',
@@ -279,7 +277,6 @@ const es: Record<keyof typeof ru, string> = {
   'practice.settings.aria': 'Ajustes',
 
   'picker.state.current': 'Actual',
-  'picker.state.done': 'Hecho',
 
   'settings.title': 'Ajustes',
   'settings.back.aria': 'Volver',
@@ -400,7 +397,6 @@ const it: Record<keyof typeof ru, string> = {
   'practice.settings.aria': 'Impostazioni',
 
   'picker.state.current': 'Attuale',
-  'picker.state.done': 'Fatto',
 
   'settings.title': 'Impostazioni',
   'settings.back.aria': 'Indietro',

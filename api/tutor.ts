@@ -89,7 +89,6 @@ function buildSystemPrompt(profile: Req['userProfile']): string {
     '  ],',
     '  "updatedCheckpoint": {              // include ONLY fields that changed; omit the rest',
     '    "currentLearningFocus"?:   { "grammarTopic": string, "sentenceType"?: string, "difficulty": number, "rule"?: string },',
-    '    "completedTopics"?:        [ string ],',
     '    "lastCheckpointSummary"?:  string',
     '  },',
     '  "nextExercise": {',
