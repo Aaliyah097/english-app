@@ -105,6 +105,12 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
   const [lastError, setLastError] = useState<string | null>(null);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isExplainOpen, setIsExplainOpen] = useState(false);
+  // "Focus mode" — when the input is focused (mobile keyboard up), we hide
+  // the topic bar and rule bubble so the source sentence + input take the
+  // whole shrunken viewport. The user only needs to see what they're
+  // translating while they type.
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const focusMode = isInputFocused && phase === 'input';
   const [errorKind, setErrorKind] = useState<
     'network-error' | 'invalid-response' | null
   >(null);
@@ -243,15 +249,18 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
         flexDirection: 'column',
       }}
     >
-      <TopicBar
-        checkpoint={checkpoint}
-        onMenu={onMenu}
-        onTopicClick={() => setIsPickerOpen((open) => !open)}
-        isPickerOpen={isPickerOpen}
-      />
+      {/* Hide TopicBar + picker in focus mode (input focused) so the source
+          sentence + input own the shrunken viewport on mobile. */}
+      {!focusMode && (
+        <TopicBar
+          checkpoint={checkpoint}
+          onMenu={onMenu}
+          onTopicClick={() => setIsPickerOpen((open) => !open)}
+          isPickerOpen={isPickerOpen}
+        />
+      )}
 
-      {/* Topic picker overlay — drops below the TopicBar when open. */}
-      {isPickerOpen && (
+      {!focusMode && isPickerOpen && (
         <div
           style={{
             position: 'absolute',
@@ -282,7 +291,10 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
           gap: 10,
         }}
       >
-        {/* Rule bubble (read-only label + rule body + Explain button) */}
+        {/* Rule bubble (read-only label + rule body + Explain button).
+            Hidden in focus mode — when the user is mid-translation, they
+            need the source sentence + input, not the rule recap. */}
+        {!focusMode && (
         <Bubble side="ai" pad="rule">
           <div
             style={{
@@ -362,6 +374,7 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
             );
           })()}
         </Bubble>
+        )}
 
         {/* Source prompt — always in the user's native language (Russian).
             Sticky so it stays visible when the on-screen keyboard pushes
@@ -475,6 +488,11 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
           placeholder={placeholder}
           cta={t(locale, 'practice.cta.check')}
           disabled={phase === 'awaiting'}
+          onFocus={() => {
+            setIsInputFocused(true);
+            setIsPickerOpen(false);
+          }}
+          onBlur={() => setIsInputFocused(false)}
         />
       )}
     </div>

@@ -9,6 +9,8 @@ type Props = {
   placeholder?: string;
   cta?: string;
   disabled?: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
 };
 
 export function InputDock({
@@ -18,6 +20,8 @@ export function InputDock({
   placeholder,
   cta = 'Send',
   disabled = false,
+  onFocus,
+  onBlur,
 }: Props) {
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -55,6 +59,8 @@ export function InputDock({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={onFocus}
+          onBlur={onBlur}
           placeholder={placeholder}
           disabled={disabled}
           aria-label="Translation input"
