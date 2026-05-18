@@ -164,30 +164,45 @@ export default async function handler(req: Request): Promise<Response> {
 
   const baseURL = process.env.DEEPSEEK_BASE_URL ?? 'https://api.deepseek.com/v1';
   // 55s timeout on the SDK call, leaving 5s for our own validation + response
-  // serialisation under the Vercel function's 60s cap. Without this we'd let
-  // Vercel kill the function blind; with it we surface a clean 502.
+  // serialisation under the Vercel function's 60s cap.
   const client = new OpenAI({ apiKey: key, baseURL, timeout: 55_000 });
   const model = process.env.DEEPSEEK_MODEL ?? 'deepseek-chat';
 
+  // Diagnostic — these go to Vercel function logs. If the upstream call
+  // hangs at the TCP/TLS layer, the SDK's `timeout` option doesn't fire,
+  // so we wrap with an external AbortController that aborts the fetch
+  // directly. Timestamps tell us whether time is spent before or after the
+  // SDK starts the request.
+  console.log(JSON.stringify({ at: 'before-deepseek', baseURL, model, t: Date.now() }));
+
+  const ac = new AbortController();
+  const abortTimer = setTimeout(() => ac.abort(), 55_000);
+
   let completion;
   try {
-    completion = await client.chat.completions.create({
-      model,
-      response_format: { type: 'json_object' },
-      temperature: 0.4,
-      // Hard ceiling on response size. At DeepSeek-V3 throughput (~25-40 tok/s)
-      // 600 tokens caps generation around 15-25s, fitting under our 60s
-      // function budget with headroom for slow turns. Real tutor responses
-      // rarely exceed 500 tokens; schema validation would reject anything
-      // weirdly truncated anyway.
-      max_tokens: 600,
-      messages: [
-        { role: 'system', content: buildSystemPrompt(parsed.data.userProfile) },
-        { role: 'user', content: buildUserPrompt(parsed.data) },
-      ],
-    });
+    completion = await client.chat.completions.create(
+      {
+        model,
+        response_format: { type: 'json_object' },
+        temperature: 0.4,
+        // Hard ceiling on response size. At DeepSeek-V3 throughput
+        // (~25-40 tok/s) 600 tokens caps generation around 15-25s. Real
+        // tutor responses rarely exceed 500 tokens; schema validation
+        // would reject anything weirdly truncated anyway.
+        max_tokens: 600,
+        messages: [
+          { role: 'system', content: buildSystemPrompt(parsed.data.userProfile) },
+          { role: 'user', content: buildUserPrompt(parsed.data) },
+        ],
+      },
+      { signal: ac.signal },
+    );
+    console.log(JSON.stringify({ at: 'after-deepseek', t: Date.now() }));
   } catch (err) {
+    console.error(JSON.stringify({ at: 'deepseek-error', message: (err as Error).message, t: Date.now() }));
     return json({ error: `Upstream error: ${(err as Error).message}` }, 502);
+  } finally {
+    clearTimeout(abortTimer);
   }
 
   const raw = completion.choices[0]?.message?.content ?? '';
