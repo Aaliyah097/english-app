@@ -15,7 +15,7 @@ import {
   learningCheckpointSchema,
   tutorResponseSchema,
   userProfileSchema,
-} from '../src/schemas';
+} from '../src/schemas.js';
 
 const requestSchema = z.object({
   userProfile: userProfileSchema,
