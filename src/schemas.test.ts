@@ -19,7 +19,6 @@ const validProfile: UserProfile = {
 const validCheckpoint: LearningCheckpoint = {
   userProfile: validProfile,
   currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
-  recentMistakes: [],
   completedTopics: [],
   currentTopicProgress: {
     topic: 'Present Simple',
@@ -27,7 +26,6 @@ const validCheckpoint: LearningCheckpoint = {
     knownWeaknesses: [],
   },
   lastCheckpointSummary: '',
-  mistakesByCategory: {},
 };
 
 const validResponse: TutorResponse = {
@@ -35,7 +33,6 @@ const validResponse: TutorResponse = {
   mistakes: [
     {
       type: 'Third-person singular -s',
-      category: 'third_person_s',
       example: 'the service read',
       correction: 'the service reads',
       explanation: 'A singular subject takes -s in Present Simple.',
@@ -130,25 +127,11 @@ describe('schemas', () => {
   it('mistakeSchema rejects an oversized explanation', () => {
     const bad = {
       type: 'Articles',
-      category: 'articles' as const,
       example: 'a',
       correction: 'an',
       explanation: 'x'.repeat(600),
     };
     expect(mistakeSchema.safeParse(bad).success).toBe(false);
-  });
-
-  it('learningCheckpointSchema rejects more than 30 recentMistakes', () => {
-    const bad = {
-      ...validCheckpoint,
-      recentMistakes: Array.from({ length: 31 }, () => ({
-        type: 't',
-        category: 'other' as const,
-        example: 'e',
-        correction: 'c',
-      })),
-    };
-    expect(learningCheckpointSchema.safeParse(bad).success).toBe(false);
   });
 
   it('tutorResponseSchema rejects an oversized messageToUser', () => {

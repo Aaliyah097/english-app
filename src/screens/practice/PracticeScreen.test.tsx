@@ -32,7 +32,6 @@ const profile: UserProfile = {
 const checkpoint: LearningCheckpoint = {
   userProfile: profile,
   currentLearningFocus: { grammarTopic: 'Present Simple', difficulty: 2, rule: '' },
-  recentMistakes: [],
   completedTopics: [],
   currentTopicProgress: {
     topic: 'Present Simple',
@@ -40,7 +39,6 @@ const checkpoint: LearningCheckpoint = {
     knownWeaknesses: [],
   },
   lastCheckpointSummary: 'Singular subjects take -s in Present Simple.',
-  mistakesByCategory: {},
 };
 
 const firstExercise: Exercise = {
@@ -78,14 +76,12 @@ function reviewResponse(
     mistakes: [
       {
         type: 'Third-person singular -s',
-        category: 'third_person_s',
         example: 'service read',
         correction: 'service reads',
         explanation: 'Singular subject takes -s in Present Simple.',
       },
       {
         type: 'Articles with technology names',
-        category: 'articles',
         example: 'from the Kafka',
         correction: 'from Kafka',
         explanation: 'Tech product names usually take no article.',

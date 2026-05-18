@@ -61,7 +61,6 @@ export function OnboardingScreen({ onComplete }: Props) {
         // until then.
         rule: '',
       },
-      recentMistakes: [],
       completedTopics: [],
       currentTopicProgress: {
         topic: 'Present Simple',
@@ -69,7 +68,6 @@ export function OnboardingScreen({ onComplete }: Props) {
         knownWeaknesses: [],
       },
       lastCheckpointSummary: '',
-      mistakesByCategory: {},
     });
 
     // Single write — the checkpoint carries the profile as a nested field.

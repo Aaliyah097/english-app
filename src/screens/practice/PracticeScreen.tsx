@@ -1,13 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { theme as T } from '../../theme';
 import { Btn, Bubble, Chip, Icon, InputDock, TypingDot } from '../../ui';
-import {
-  bumpMistakeCategories,
-  getCheckpoint,
-  getUserProfile,
-  mergeCheckpoint,
-  subscribe,
-} from '../../storage';
+import { getCheckpoint, getUserProfile, mergeCheckpoint, subscribe } from '../../storage';
 import type { Exercise, LearningCheckpoint, Mistake, TutorResponse, UserProfile } from '../../types';
 import { InlineDiff } from './InlineDiff';
 import { TopicBar } from './TopicBar';
@@ -158,10 +152,6 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
     if (result.kind === 'ok') {
       try {
         mergeCheckpoint(result.response.updatedCheckpoint);
-        // Bump lifetime per-category counters for THIS turn's mistakes. Each
-        // category is counted at most once per turn (handled inside the helper).
-        const cats = result.response.mistakes.map((m) => m.category);
-        if (cats.length > 0) bumpMistakeCategories(cats);
       } catch {
         // Storage merge can throw if the checkpoint was cleared mid-flight.
         // Treat as a soft error — keep the response in memory.

@@ -79,7 +79,6 @@ export function EditProfilePanel() {
       mergeCheckpoint({
         currentLearningFocus: { rule: '' },
         lastCheckpointSummary: '',
-        recentMistakes: [],
       });
     }
   };

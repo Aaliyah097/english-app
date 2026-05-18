@@ -25,7 +25,6 @@ const SAMPLE_CHECKPOINT: LearningCheckpoint = learningCheckpointSchema.parse({
     knownWeaknesses: [],
   },
   lastCheckpointSummary: '',
-  mistakesByCategory: {},
 });
 
 describe('SettingsScreen', () => {
