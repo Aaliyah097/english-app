@@ -24,6 +24,11 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: '#faf9f6',
+  // Mobile browsers default to keeping the layout viewport at full height
+  // when the soft keyboard opens, which pushes our absolute-positioned
+  // input dock below the visible area. `resizes-content` makes the layout
+  // viewport shrink along with the keyboard so the dock stays in view.
+  interactiveWidget: 'resizes-content',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

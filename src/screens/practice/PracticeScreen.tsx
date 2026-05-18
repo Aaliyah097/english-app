@@ -363,25 +363,38 @@ function PracticeScreenInner({ profile, checkpoint, onMenu }: InnerProps) {
           })()}
         </Bubble>
 
-        {/* Source prompt — always in the user's native language (Russian). */}
+        {/* Source prompt — always in the user's native language (Russian).
+            Sticky so it stays visible when the on-screen keyboard pushes
+            content up: the user needs to see what they're translating
+            while they type. */}
         {currentExercise.sentence !== '' && (
-          <Bubble side="ai">
-            <div style={{ fontSize: 13, color: T.muted, marginBottom: 6 }}>
-              {profile.targetLanguage.toUpperCase()} →
-            </div>
-            <div
-              // Same typography as the rule body — regular weight + ink (not
-              // ink2) so it reads as the prompt without standing out as bold.
-              style={{
-                fontFamily: T.fontBody,
-                fontSize: 14,
-                lineHeight: 1.5,
-                color: T.ink,
-              }}
-            >
-              {currentExercise.sentence}
-            </div>
-          </Bubble>
+          <div
+            style={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 20,
+              background: T.bg,
+              paddingBottom: 4,
+            }}
+          >
+            <Bubble side="ai">
+              <div style={{ fontSize: 13, color: T.muted, marginBottom: 6 }}>
+                {profile.targetLanguage.toUpperCase()} →
+              </div>
+              <div
+                // Same typography as the rule body — regular weight + ink (not
+                // ink2) so it reads as the prompt without standing out as bold.
+                style={{
+                  fontFamily: T.fontBody,
+                  fontSize: 14,
+                  lineHeight: 1.5,
+                  color: T.ink,
+                }}
+              >
+                {currentExercise.sentence}
+              </div>
+            </Bubble>
+          </div>
         )}
 
         {/* User answer (shown once submitted) */}
